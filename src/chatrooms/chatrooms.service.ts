@@ -48,13 +48,13 @@ export class ChatRoomsService {
     return chatroom;
   }
   async saveMessageToHistoryOwner(id: string, context: string) {
-    this.historyService.createHistory(
+    return await this.historyService.createHistory(
       context,
       id,
       (await this.chatroomModel.findById(id)).owner,
     );
   }
   async saveMessageToHistoryAdmin(id: string, context: string) {
-    this.historyService.createHistory(context, id, 'admin');
+    return await this.historyService.createHistory(context, id, 'admin');
   }
 }
