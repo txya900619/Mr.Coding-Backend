@@ -5,6 +5,7 @@ export interface History extends Document {
   readonly context: string;
   readonly chatroomID: string;
   readonly author: string;
+  readonly read: boolean;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }

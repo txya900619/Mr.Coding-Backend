@@ -17,8 +17,11 @@ export class ChatRoomsService {
     return createdChatRoom.save();
   }
   async getChatRoomByIdentify(identify: string): Promise<ChatRoom> {
-    const ChatRoom = this.chatroomModel.findOne({ identify: identify });
+    const ChatRoom = await this.chatroomModel.findOne({ identify: identify });
     return ChatRoom;
+  }
+  async getChatRoomById(id: string): Promise<ChatRoom> {
+    return await this.chatroomModel.findById(id);
   }
   async bindOwnerToChatRoom(
     id: string,
@@ -46,15 +49,5 @@ export class ChatRoomsService {
     );
 
     return chatroom;
-  }
-  async saveMessageToHistoryOwner(id: string, context: string) {
-    return await this.historyService.createHistory(
-      context,
-      id,
-      (await this.chatroomModel.findById(id)).owner,
-    );
-  }
-  async saveMessageToHistoryAdmin(id: string, context: string) {
-    return await this.historyService.createHistory(context, id, 'admin');
   }
 }
