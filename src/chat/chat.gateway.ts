@@ -9,7 +9,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { History } from 'src/history/history.interface';
-import { HttpException, HttpStatus } from '@nestjs/common';
 
 @WebSocketGateway()
 export class ChatGateway {
@@ -35,18 +34,15 @@ export class ChatGateway {
   ) {
     let result: History;
     if (true) {
-      result = await this.chatService.saveMessageToHistoryAdmin(
-        Object.keys(client.rooms)[0],
+      console.log(client.rooms);
+      result = await this.chatService.saveMessageToHistory(
+        Object.keys(client.rooms)[1],
         data,
-      ); //if admin auth pass, use guard
-    } else {
-      result = await this.chatService.saveMessageToHistoryOwner(
-        Object.keys(client.rooms)[0],
-        data,
-      );
+        'admin',
+      ); //admin should replace with user
     }
     this.server.sockets
-      .to(Object.keys(client.rooms)[0])
+      .to(Object.keys(client.rooms)[1])
       .emit('message', result);
   }
 
@@ -57,12 +53,16 @@ export class ChatGateway {
   ) {
     let readMessage: History;
     try {
-      readMessage = await this.chatService.readMessage(data);
+      readMessage = await this.chatService.readMessage(
+        data,
+        Object.keys(client.rooms)[1],
+        'notAdmin',
+      );
     } catch (e) {
-      throw new HttpException(e, HttpStatus.BAD_REQUEST);
+      throw new WsException(e.toString());
     }
     this.server.sockets
-      .to(Object.keys(client.rooms)[0])
+      .to(Object.keys(client.rooms)[1])
       .emit('read', readMessage);
   }
 }

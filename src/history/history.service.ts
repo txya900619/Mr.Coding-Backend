@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { History } from './history.interface';
@@ -11,6 +11,17 @@ export class HistoryService {
   async createHistory(context: string, chatroomID: string, author: string) {
     const creatHistory = new this.historyModel({ context, chatroomID, author });
     return creatHistory.save();
+  }
+  async checkHistoryByChatroomIDAndAuthor(
+    id: string,
+    chatroomID: string,
+    user: string,
+  ) {
+    const history = await this.historyModel.findById(id);
+    if (history.chatroomID === chatroomID && history.author !== user) {
+      return true;
+    }
+    return false;
   }
   async getHistoryByIDAndTime(
     id: string,
@@ -25,7 +36,8 @@ export class HistoryService {
   async readInHistoryToTrue(id: string): Promise<History> {
     let history: History;
     try {
-      history = await this.historyModel.findByIdAndUpdate(id, { read: true });
+      await this.historyModel.findByIdAndUpdate(id, { read: true });
+      history = await this.historyModel.findById(id);
     } catch (e) {
       throw new Error(`can't find message that match this id:${id}`);
     }
