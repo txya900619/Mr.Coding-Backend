@@ -12,7 +12,7 @@ export class HistoryService {
     const creatHistory = new this.historyModel({ context, chatroomID, author });
     return creatHistory.save();
   }
-  async checkHistoryByChatroomIDAndAuthor(
+  async checkHistoryByChatroomIDAndUser(
     id: string,
     chatroomID: string,
     user: string,

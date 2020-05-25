@@ -30,7 +30,7 @@ export class ChatService {
       user = (await this.chatroomService.getChatRoomById(id)).owner;
     }
     if (
-      !(await this.historyService.checkHistoryByChatroomIDAndAuthor(
+      !(await this.historyService.checkHistoryByChatroomIDAndUser(
         id,
         chatroomId,
         user,
