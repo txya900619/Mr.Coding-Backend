@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HistoryService } from 'src/history/history.service';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { History } from 'src/history/history.interface';
+import { read } from 'fs';
 
 @Injectable()
 export class ChatService {
@@ -39,11 +40,12 @@ export class ChatService {
       throw new Error('chatroomID or author not match');
     }
 
-    let readMessage: History;
-    try {
-      readMessage = await this.historyService.readInHistoryToTrue(id);
-    } catch (e) {
-      throw e;
+    const readMessage = await this.historyService.readInHistoryToTrue(id);
+    if (!readMessage) {
+      throw new HttpException(
+        `can't find message that match this id:${id}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return readMessage;
   }

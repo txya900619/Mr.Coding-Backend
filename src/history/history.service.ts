@@ -36,10 +36,13 @@ export class HistoryService {
   async readInHistoryToTrue(id: string): Promise<History> {
     let history: History;
     try {
-      await this.historyModel.findByIdAndUpdate(id, { read: true });
-      history = await this.historyModel.findById(id);
+      history = await this.historyModel.findByIdAndUpdate(
+        id,
+        { read: true },
+        { new: true },
+      );
     } catch (e) {
-      throw new Error(`can't find message that match this id:${id}`);
+      return null;
     }
     return history;
   }

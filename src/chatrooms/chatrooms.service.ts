@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
@@ -17,35 +17,26 @@ export class ChatRoomsService {
     return createdChatRoom.save();
   }
   async getChatRoomByIdentify(identify: string): Promise<ChatRoom> {
-    const ChatRoom = await this.chatroomModel.findOne({ identify: identify });
+    const ChatRoom = await this.chatroomModel
+      .findOne({ identify: identify })
+      .exec();
     return ChatRoom;
   }
   async getChatRoomById(id: string): Promise<ChatRoom> {
-    return await this.chatroomModel.findById(id);
+    return await this.chatroomModel.findOne({ _id: id }).exec();
   }
   async bindOwnerToChatRoom(
     id: string,
     bindOwnerDto: BindOwnerDto,
   ): Promise<ChatRoom> {
-    let testChatRoom;
-    try {
-      testChatRoom = await this.chatroomModel.findById(id);
-    } catch (e) {
-      throw new HttpException(
-        `not found chatroom match this id: ${id}`,
-        HttpStatus.BAD_REQUEST,
-      );
+    const testChatRoom = await this.chatroomModel.findOne({ _id: id }).exec();
+    if (!testChatRoom || testChatRoom.owner) {
+      return null;
     }
-    if (testChatRoom.owner) {
-      throw new HttpException(
-        `this chatroom have a owner`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     const chatroom = await this.chatroomModel.findByIdAndUpdate(
       id,
       bindOwnerDto,
+      { new: true },
     );
 
     return chatroom;

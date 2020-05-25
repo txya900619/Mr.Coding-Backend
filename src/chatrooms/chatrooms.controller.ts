@@ -31,7 +31,7 @@ export class ChatRoomsController {
     if (!chatroom) {
       throw new HttpException(
         `Not found chatroom match this identify: ${identify}`,
-        HttpStatus.NOT_FOUND,
+        HttpStatus.BAD_REQUEST,
       );
     }
     return chatroom;
@@ -49,7 +49,12 @@ export class ChatRoomsController {
       id,
       bindOwnerDto,
     );
-
+    if (!chatroom) {
+      throw new HttpException(
+        'not found chatroom or this chatroom have a owner',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return chatroom;
   }
 }
