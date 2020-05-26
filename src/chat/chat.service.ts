@@ -3,12 +3,14 @@ import { HistoryService } from 'src/history/history.service';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { History } from 'src/history/history.interface';
 import { read } from 'fs';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatService {
   constructor(
     private historyService: HistoryService,
     private chatroomService: ChatRoomsService,
+    private userService: UsersService,
   ) {}
   async saveMessageToHistory(
     id: string,
@@ -28,7 +30,7 @@ export class ChatService {
     user?: string,
   ): Promise<History> {
     if (!user) {
-      user = (await this.chatroomService.getChatRoomById(id)).owner;
+      user = await this.findChatRoomOwnerByID(id);
     }
     if (
       !(await this.historyService.checkHistoryByChatroomIDAndUser(
@@ -48,5 +50,11 @@ export class ChatService {
       );
     }
     return readMessage;
+  }
+  async findChatRoomOwnerByID(id: string) {
+    return (await this.chatroomService.getChatRoomById(id)).owner;
+  }
+  async verifyUsername(username: string) {
+    return await this.userService.findOneByUsername(username);
   }
 }

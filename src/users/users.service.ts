@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Document } from 'mongoose';
+import { Model } from 'mongoose';
 import { Users } from './users.interface';
 
 @Injectable()
@@ -10,9 +10,6 @@ export class UsersService {
   ) {}
   async findOneByUsername(username: string): Promise<Users> {
     const user = await this.usersModel.findOne({ username: username }).exec();
-    if (!user) {
-      return null;
-    }
     return user;
   }
 }

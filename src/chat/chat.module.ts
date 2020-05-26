@@ -3,9 +3,10 @@ import { ChatGateway } from './chat.gateway';
 import { HistoryModule } from 'src/history/history.module';
 import { ChatRoomModule } from 'src/chatrooms/chatrooms.module';
 import { ChatService } from './chat.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [HistoryModule, ChatRoomModule],
+  imports: [HistoryModule, ChatRoomModule, UsersModule],
   providers: [ChatGateway, ChatService],
 })
 export class ChatModule {}
