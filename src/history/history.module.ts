@@ -8,7 +8,6 @@ import { ChatRoomModule } from 'src/chatrooms/chatrooms.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'History', schema: HistorySchema }]),
-    ,
     ChatRoomModule,
   ],
   controllers: [HistoryController],
