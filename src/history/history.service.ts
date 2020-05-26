@@ -12,18 +12,10 @@ export class HistoryService {
     const creatHistory = new this.historyModel({ context, chatroomID, author });
     return creatHistory.save();
   }
-  async checkHistoryByChatroomIDAndUser(
-    id: string,
-    chatroomID: string,
-    user: string,
-  ) {
-    const history = await this.historyModel.findById(id);
-    if (history.chatroomID === chatroomID && history.author !== user) {
-      return true;
-    }
-    return false;
+  async findOneByID(id: string) {
+    return await this.historyModel.findOne({ _id: id }).exec();
   }
-  async getHistoryByIDAndTime(
+  async findByIDAndTime(
     id: string,
     lastTime: Date,
     number: number,
@@ -33,7 +25,7 @@ export class HistoryService {
       .limit(number);
     return history;
   }
-  async readInHistoryToTrue(id: string): Promise<History> {
+  async updateReadToTrue(id: string): Promise<History> {
     let history: History;
     try {
       history = await this.historyModel.findByIdAndUpdate(

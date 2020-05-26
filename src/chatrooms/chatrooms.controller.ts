@@ -25,19 +25,17 @@ export class ChatRoomsController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const chatroom = await this.chatroomsService.getChatRoomByIdentify(
-      identify,
-    );
+    const chatroom = await this.chatroomsService.findOneByIdentify(identify);
     if (!chatroom) {
       throw new HttpException(
         `Not found chatroom match this identify: ${identify}`,
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.NOT_FOUND,
       );
     }
     return chatroom;
   }
 
-  @Post()
+  @Post() // need auth
   async createChatRoom(@Body() createChatRoomDto: CreateChatRoomDto) {
     const chatroom = await this.chatroomsService.creat(createChatRoomDto);
     return chatroom;

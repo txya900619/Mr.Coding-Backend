@@ -5,38 +5,48 @@ import {
   MessageBody,
   ConnectedSocket,
   WsException,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { History } from 'src/history/history.interface';
 import { Authorization } from 'src/auth/authorization.decorator';
+import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
+import { UsersService } from 'src/users/users.service';
+import { ExtendedSocket } from './extendedSocket.interface';
+import { HistoryService } from 'src/history/history.service';
 
 @WebSocketGateway()
 export class ChatGateway {
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private chatroomsService: ChatRoomsService,
+    private usersService: UsersService,
+    private historyService: HistoryService,
+  ) {}
   @WebSocketServer()
   server: Server;
 
   @SubscribeMessage('join')
   async handleJoin(
     @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: ExtendedSocket,
     @Authorization() user: any,
   ) {
     if (!user) {
       if (!client.handshake.headers['userID']) {
         throw new WsException('Unauthorized access');
       }
-      if (
-        client.handshake.headers['userID'] !==
-        this.chatService.findChatRoomOwnerByID(data)
-      ) {
+      const chatroom = await this.chatroomsService.findOneByID(data);
+      if (client.handshake.headers['userID'] !== chatroom.owner) {
         throw new WsException('Unauthorized access');
       }
+      client.username = chatroom.owner;
     } else {
-      if (!this.chatService.verifyUsername(user.username)) {
+      if (!(await this.usersService.findOneByUsername(user.username))) {
         throw new WsException('Unauthorized access');
       }
+      client.username = user.username;
     }
     client.join(data);
   }
@@ -44,25 +54,18 @@ export class ChatGateway {
   @SubscribeMessage('message')
   async handleMessage(
     @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
-    @Authorization() user: any,
+    @ConnectedSocket() client: ExtendedSocket,
   ) {
     if (Object.keys(client.rooms).length === 1) {
       throw new WsException('should join room');
     }
-    let result: History;
-    if (user) {
-      result = await this.chatService.saveMessageToHistory(
-        Object.keys(client.rooms)[1],
-        data,
-        user.username,
-      ); //admin should replace with user
-    } else {
-      result = await this.chatService.saveMessageToHistory(
-        Object.keys(client.rooms)[1],
-        data,
-      );
-    }
+
+    const result = await this.historyService.createHistory(
+      Object.keys(client.rooms)[1],
+      data,
+      client.username,
+    ); //admin should replace with user
+
     this.server.sockets
       .to(Object.keys(client.rooms)[1])
       .emit('message', result);
@@ -71,29 +74,22 @@ export class ChatGateway {
   @SubscribeMessage('read')
   async readMessage(
     @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
-    @Authorization() user: any,
+    @ConnectedSocket() client: ExtendedSocket,
   ) {
     if (Object.keys(client.rooms).length === 1) {
       throw new WsException('should join room');
     }
-    let readMessage: History;
-    try {
-      if (user) {
-        readMessage = await this.chatService.readMessage(
-          data,
-          Object.keys(client.rooms)[1],
-          user.username,
-        );
-      } else {
-        readMessage = await this.chatService.readMessage(
-          data,
-          Object.keys(client.rooms)[1],
-        );
-      }
-    } catch (e) {
-      throw new WsException(e.toString());
+    const readMessage = await this.chatService.readMessage(
+      data,
+      Object.keys(client.rooms)[1],
+      client.username,
+    );
+    if (!readMessage) {
+      throw new WsException(
+        "this account can't read this message or can't find message",
+      );
     }
+
     this.server.sockets
       .to(Object.keys(client.rooms)[1])
       .emit('read', readMessage);

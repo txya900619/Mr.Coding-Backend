@@ -4,25 +4,23 @@ import { Model } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { BindOwnerDto } from './dto/bind-owner.dto';
-import { HistoryService } from 'src/history/history.service';
 
 @Injectable()
 export class ChatRoomsService {
   constructor(
     @InjectModel('ChatRoom') private readonly chatroomModel: Model<ChatRoom>,
-    private readonly historyService: HistoryService,
   ) {}
   async creat(creatChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
     const createdChatRoom = new this.chatroomModel(creatChatRoomDto);
     return createdChatRoom.save();
   }
-  async getChatRoomByIdentify(identify: string): Promise<ChatRoom> {
+  async findOneByIdentify(identify: string): Promise<ChatRoom> {
     const ChatRoom = await this.chatroomModel
       .findOne({ identify: identify })
       .exec();
     return ChatRoom;
   }
-  async getChatRoomById(id: string): Promise<ChatRoom> {
+  async findOneByID(id: string): Promise<ChatRoom> {
     return await this.chatroomModel.findOne({ _id: id }).exec();
   }
   async bindOwnerToChatRoom(
