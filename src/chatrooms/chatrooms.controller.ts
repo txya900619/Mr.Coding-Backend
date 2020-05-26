@@ -38,6 +38,9 @@ export class ChatRoomsController {
   @Post() // need auth
   async createChatRoom(@Body() createChatRoomDto: CreateChatRoomDto) {
     const chatroom = await this.chatroomsService.creat(createChatRoomDto);
+    if (!chatroom) {
+      throw new HttpException('chatroom crate error', HttpStatus.BAD_REQUEST);
+    }
     return chatroom;
   }
 

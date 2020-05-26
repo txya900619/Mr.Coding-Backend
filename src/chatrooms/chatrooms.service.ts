@@ -12,7 +12,7 @@ export class ChatRoomsService {
   ) {}
   async creat(creatChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
     const createdChatRoom = new this.chatroomModel(creatChatRoomDto);
-    return createdChatRoom.save();
+    return await createdChatRoom.save();
   }
   async findOneByIdentify(identify: string): Promise<ChatRoom> {
     const ChatRoom = await this.chatroomModel
