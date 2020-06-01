@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { BindOwnerDto } from './dto/bind-owner.dto';
+import { ChangeClosedDto } from './dto/change-closed.dto';
 
 @Injectable()
 export class ChatRoomsService {
@@ -13,6 +14,9 @@ export class ChatRoomsService {
   async creat(creatChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
     const createdChatRoom = new this.chatroomModel(creatChatRoomDto);
     return await createdChatRoom.save();
+  }
+  async findAll(): Promise<ChatRoom[]> {
+    return await this.chatroomModel.find().exec();
   }
   async findOneByIdentify(identify: string): Promise<ChatRoom> {
     const ChatRoom = await this.chatroomModel
@@ -38,5 +42,17 @@ export class ChatRoomsService {
     );
 
     return chatroom;
+  }
+
+  async changeClosed(id: string, changeClosedDto: ChangeClosedDto) {
+    const chatroom = this.chatroomModel.findOne({ _id: id });
+    if (!chatroom) {
+      return null;
+    }
+    return await this.chatroomModel
+      .findByIdAndUpdate(id, changeClosedDto, {
+        new: true,
+      })
+      .exec();
   }
 }

@@ -5,11 +5,9 @@ import {
   MessageBody,
   ConnectedSocket,
   WsException,
-  OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { ChatService } from './chat.service';
-import { History } from 'src/history/history.interface';
 import { Authorization } from 'src/auth/authorization.decorator';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { UsersService } from 'src/users/users.service';

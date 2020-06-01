@@ -17,31 +17,29 @@ export class UsersService {
   async findOneByUsernamePublic(username: string): Promise<Users> {
     return await this.usersModel
       .findOne({ username: username })
-      .populate('-password', '-_id')
+      .select('-password')
       .exec();
   }
-  async updateInfo(username: string, info: UpdateInfoDto): Promise<Users> {
-    return await this.usersModel.findOneAndUpdate(
-      { username: username },
-      info,
-      { new: true },
-    );
+  async updateInfo(id: string, info: UpdateInfoDto): Promise<Users> {
+    return await this.usersModel
+      .findByIdAndUpdate(id, info, { new: true })
+      .select('-password')
+      .exec();
   }
 
-  async updateAvatar(
-    username: string,
-    avatar: UpdateAvatarDto,
-  ): Promise<Users> {
-    return await this.usersModel.findOneAndUpdate(
-      { username: username },
-      avatar,
-      { new: true },
-    );
+  async updateAvatar(id: string, avatar: UpdateAvatarDto): Promise<Users> {
+    return await this.usersModel
+      .findByIdAndUpdate(id, avatar, { new: true })
+      .select('-password')
+      .exec();
   }
 
-  async updateCc(username: string, cc: UpdateCcDto): Promise<Users> {
-    return await this.usersModel.findOneAndUpdate({ username: username }, cc, {
-      new: true,
-    });
+  async updateCc(id: string, cc: UpdateCcDto): Promise<Users> {
+    return await this.usersModel
+      .findByIdAndUpdate(id, cc, {
+        new: true,
+      })
+      .select('-password')
+      .exec();
   }
 }

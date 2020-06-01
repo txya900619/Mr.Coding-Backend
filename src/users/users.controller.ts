@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
   Body,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,8 +20,11 @@ import { UpdateCcDto } from './dto/update-cc.dto';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Get(':username')
-  async getUser(@Param(':username') username: string) {
+  @Get()
+  async getUser(@Query('username') username: string) {
+    if (!username) {
+      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
+    } // maybe get all user
     const user = await this.usersService.findOneByUsernamePublic(username);
     if (!user) {
       throw new HttpException('this user not exist', HttpStatus.NOT_FOUND);
@@ -29,41 +33,41 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':username/info')
+  @Patch(':id/info')
   async changeInfo(
-    @Param(':username') username: string,
+    @Param(':id') id: string,
     @Request() req,
     @Body() updateInfoDto: UpdateInfoDto,
   ) {
-    if (req.user.username != username) {
-      throw new HttpException('Permission denied', HttpStatus.BAD_REQUEST);
+    if (req.user._id != id) {
+      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
-    return await this.usersService.updateInfo(username, updateInfoDto);
+    return await this.usersService.updateInfo(id, updateInfoDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':username/avatar')
+  @Patch(':id/avatar')
   async changeAvatarUrl(
-    @Param(':username') username: string,
+    @Param(':id') id: string,
     @Request() req,
     @Body() updateAvatarDto: UpdateAvatarDto,
   ) {
-    if (req.user.username != username) {
-      throw new HttpException('Permission denied', HttpStatus.BAD_REQUEST);
+    if (req.user._id != id) {
+      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
-    return await this.usersService.updateAvatar(username, updateAvatarDto);
+    return await this.usersService.updateAvatar(id, updateAvatarDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':username/cc')
+  @Patch(':id/cc')
   async changeCc(
-    @Param(':username') username: string,
+    @Param(':id') id: string,
     @Request() req,
     @Body() updateCcDto: UpdateCcDto,
   ) {
-    if (req.user.username != username) {
-      throw new HttpException('Permission denied', HttpStatus.BAD_REQUEST);
+    if (req.user._id != id) {
+      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
-    return await this.usersService.updateCc(username, updateCcDto);
+    return await this.usersService.updateCc(id, updateCcDto);
   }
 }
