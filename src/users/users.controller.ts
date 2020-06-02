@@ -40,7 +40,10 @@ export class UsersController {
     @Body() updateInfoDto: UpdateInfoDto,
   ) {
     if (req.user._id != id) {
-      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        "You can't change other's info",
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return await this.usersService.updateInfo(id, updateInfoDto);
   }
@@ -53,7 +56,10 @@ export class UsersController {
     @Body() updateAvatarDto: UpdateAvatarDto,
   ) {
     if (req.user._id != id) {
-      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        "You can't change other's avatar",
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return await this.usersService.updateAvatar(id, updateAvatarDto);
   }
@@ -66,7 +72,10 @@ export class UsersController {
     @Body() updateCcDto: UpdateCcDto,
   ) {
     if (req.user._id != id) {
-      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        "You can't change other's cc",
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return await this.usersService.updateCc(id, updateCcDto);
   }
