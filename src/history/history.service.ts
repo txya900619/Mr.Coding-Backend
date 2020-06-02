@@ -17,8 +17,8 @@ export class HistoryService {
   }
   async findByIDAndTime(
     id: string,
-    lastTime: Date,
-    number: number,
+    lastTime?: Date,
+    number?: number,
   ): Promise<History[]> {
     if (!number) {
       number = 0;

@@ -19,10 +19,10 @@ export class HistoryController {
   ) {}
   @Get(':id/history')
   async getHistory(
-    @Param('id') id,
-    @Query('lastTime') lastTime,
-    @Query('number') number,
-    @Headers('userID') userID,
+    @Param('id') id: string,
+    @Query('lastTime') lastTime: Date,
+    @Query('number') number: number,
+    @Headers('userID') userID: string,
     @Authorization() user,
   ) {
     if (!user) {
@@ -36,7 +36,7 @@ export class HistoryController {
     const history = await this.historyService.findByIDAndTime(
       id,
       lastTime,
-      Number(number),
+      number,
     );
     return history;
   }
