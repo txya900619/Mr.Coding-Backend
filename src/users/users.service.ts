@@ -11,9 +11,15 @@ export class UsersService {
   constructor(
     @InjectModel('Users') private readonly usersModel: Model<Users>,
   ) {}
+
   async findOneByUsername(username: string): Promise<Users> {
     return await this.usersModel.findOne({ username: username }).exec();
   }
+
+  async findAllPublic(): Promise<Users[]> {
+    return await this.usersModel.find().exec();
+  }
+
   async findOneByUsernamePublic(username: string): Promise<Users> {
     return await this.usersModel
       .findOne({ username: username })

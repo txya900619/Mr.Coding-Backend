@@ -23,8 +23,8 @@ export class UsersController {
   @Get()
   async getUser(@Query('username') username: string) {
     if (!username) {
-      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
-    } // maybe get all user
+      return await this.usersService.findAllPublic();
+    }
     const user = await this.usersService.findOneByUsernamePublic(username);
     if (!user) {
       return [];
