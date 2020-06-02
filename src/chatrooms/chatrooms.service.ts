@@ -5,6 +5,7 @@ import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { BindOwnerDto } from './dto/bind-owner.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class ChatRoomsService {
@@ -35,6 +36,7 @@ export class ChatRoomsService {
     if (!testChatRoom || testChatRoom.owner) {
       return null;
     }
+    bindOwnerDto.owner = await hash(bindOwnerDto.owner, 10); //hash user_id
     const chatroom = await this.chatroomModel.findByIdAndUpdate(
       id,
       bindOwnerDto,

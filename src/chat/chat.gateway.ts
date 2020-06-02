@@ -13,6 +13,7 @@ import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { UsersService } from 'src/users/users.service';
 import { ExtendedSocket } from './extendedSocket.interface';
 import { HistoryService } from 'src/history/history.service';
+import { compare } from 'bcrypt';
 
 @WebSocketGateway()
 export class ChatGateway {
@@ -36,10 +37,11 @@ export class ChatGateway {
         throw new WsException('Unauthorized access');
       }
       const chatroom = await this.chatroomsService.findOneByID(data);
-      if (client.handshake.headers['userID'] !== chatroom.owner) {
+
+      if (await compare(client.handshake.headers['userID'], chatroom.owner)) {
         throw new WsException('Unauthorized access');
-      }
-      client.username = chatroom.owner;
+      } // check user_id
+      client.username = client.handshake.headers['userID'];
     } else {
       if (!(await this.usersService.findOneByUsername(user.username))) {
         throw new WsException('Unauthorized access');
@@ -62,7 +64,7 @@ export class ChatGateway {
       Object.keys(client.rooms)[1],
       data,
       client.username,
-    ); //admin should replace with user
+    );
 
     this.server.sockets
       .to(Object.keys(client.rooms)[1])
