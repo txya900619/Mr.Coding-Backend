@@ -9,13 +9,16 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { ChatRoomsService } from './chatrooms.service';
 import { BindOwnerDto } from './dto/bind-owner.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
+import { config } from 'dotenv';
 
+config();
 @Controller('api/chatrooms')
 export class ChatRoomsController {
   constructor(private chatroomsService: ChatRoomsService) {}
@@ -34,7 +37,13 @@ export class ChatRoomsController {
   }
 
   @Post() // need auth
-  async createChatRoom(@Body() createChatRoomDto: CreateChatRoomDto) {
+  async createChatRoom(
+    @Body() createChatRoomDto: CreateChatRoomDto,
+    @Headers('Authorization') auth,
+  ) {
+    if (auth !== (process.env.googleScriptAuth || 'cc')) {
+      throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
+    }
     const chatroom = await this.chatroomsService.creat(createChatRoomDto);
     if (!chatroom) {
       throw new HttpException('chatroom crate error', HttpStatus.BAD_REQUEST);
