@@ -5,6 +5,7 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Headers,
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { Authorization } from 'src/auth/authorization.decorator';
@@ -21,7 +22,7 @@ export class HistoryController {
     @Param('id') id,
     @Query('lastTime') lastTime,
     @Query('number') number,
-    @Query('userID') userID,
+    @Headers('userID') userID,
     @Authorization() user,
   ) {
     if (!user) {

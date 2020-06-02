@@ -20,6 +20,12 @@ export class HistoryService {
     lastTime: Date,
     number: number,
   ): Promise<History[]> {
+    if (!number) {
+      number = 0;
+    }
+    if (!lastTime) {
+      lastTime = new Date();
+    }
     const history = await this.historyModel
       .find({ chatroomID: id, createdAt: { $gt: lastTime } })
       .limit(number);
