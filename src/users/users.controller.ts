@@ -27,7 +27,7 @@ export class UsersController {
     } // maybe get all user
     const user = await this.usersService.findOneByUsernamePublic(username);
     if (!user) {
-      throw new HttpException('this user not exist', HttpStatus.NOT_FOUND);
+      return [];
     }
     return user;
   }
