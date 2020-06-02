@@ -7,11 +7,12 @@ config();
 export const Authorization = createParamDecorator(
   (_, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    const authHeader = request.headers['authorization'];
-    if (!authHeader) {
+    try {
+      request.headers['authorization'];
+    } catch (e) {
       return null;
     }
-    const matches = authHeader.match(/(\S+)\s+(\S+)/);
+    const matches = request.headers['authorization'].match(/(\S+)\s+(\S+)/);
     if (!matches || matches[1] !== 'bearer') {
       return null;
     }
