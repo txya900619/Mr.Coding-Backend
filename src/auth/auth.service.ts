@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { config } from 'dotenv';
+import { Users } from 'src/users/users.interface';
 
+config();
 @Injectable()
 export class AuthService {
   constructor(
@@ -14,12 +17,11 @@ export class AuthService {
     if (!user || user.password !== unCheckPassword) {
       return null;
     }
-    const { password, ...result } = user;
-    return result;
+    return user;
   }
 
-  async login(user: any) {
+  async login(user: Users) {
     const payload = { username: user.username, sub: user._id };
-    return this.jwtService.sign(payload);
+    return await this.jwtService.sign(payload);
   }
 }

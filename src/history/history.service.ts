@@ -27,7 +27,7 @@ export class HistoryService {
       lastTime = new Date();
     }
     const history = await this.historyModel
-      .find({ chatroomID: id, createdAt: { $gt: lastTime } })
+      .find({ chatroomID: id, createdAt: { $lt: lastTime } })
       .limit(number);
     return history;
   }
