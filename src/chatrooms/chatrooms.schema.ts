@@ -4,4 +4,5 @@ export const ChatRoomSchema = new mongoose.Schema({
   owner: String,
   identify: String,
   closed: { type: Boolean, default: false },
+  lineAccessToken: { type: String, default: '' },
 });

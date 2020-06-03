@@ -17,23 +17,19 @@ import { BindOwnerDto } from './dto/bind-owner.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
+import { async } from 'rxjs/internal/scheduler/async';
+import { compare } from 'bcrypt';
+import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
 
 config();
 @Controller('api/chatrooms')
 export class ChatRoomsController {
   constructor(private chatroomsService: ChatRoomsService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async getChatRoom(@Query('identify') identify) {
-    if (identify) {
-      const chatroom = await this.chatroomsService.findOneByIdentify(identify);
-      if (!chatroom) {
-        return [];
-      }
-      return chatroom;
-    } else {
-      return await this.chatroomsService.findAll();
-    }
+  async getChatRooms() {
+    return await this.chatroomsService.findAll();
   }
 
   @Post() // need auth
@@ -51,19 +47,38 @@ export class ChatRoomsController {
     return chatroom;
   }
 
-  @Patch(':id/owner')
-  async bindOwner(@Param('id') id, @Body() bindOwnerDto: BindOwnerDto) {
-    const chatroom = await this.chatroomsService.bindOwnerToChatRoom(
-      id,
-      bindOwnerDto,
-    );
+  @Get(':id')
+  async getChatroom(@Param('id') id) {
+    const chatroom = await this.chatroomsService.findOneByID(id);
     if (!chatroom) {
       throw new HttpException(
-        'not found chatroom or this chatroom have a owner',
-        HttpStatus.BAD_REQUEST,
+        'not found chatroom match this id',
+        HttpStatus.NOT_FOUND,
       );
     }
     return chatroom;
+  }
+
+  @Patch(':id/lineAccessToken')
+  async updateLineAccessToken(
+    @Param() id,
+    @Headers('userID') userID,
+    @Body() changeLineAccessTokenDto: ChangeLineAccessTokenDto,
+  ) {
+    const chatroom = await this.chatroomsService.findOneByID(id);
+    if (!chatroom) {
+      throw new HttpException(
+        'not found chatroom match this id',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (!(await compare(userID, chatroom.owner))) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    return await this.chatroomsService.changeLineAccessToken(
+      id,
+      changeLineAccessTokenDto,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -78,6 +93,21 @@ export class ChatRoomsController {
     );
     if (!chatroom) {
       throw new HttpException('not found chatroom', HttpStatus.NOT_FOUND);
+    }
+    return chatroom;
+  }
+
+  @Patch('identify/:identify/owner')
+  async bindOwner(@Param('id') identify, @Body() bindOwnerDto: BindOwnerDto) {
+    const chatroom = await this.chatroomsService.bindOwnerToChatRoom(
+      identify,
+      bindOwnerDto,
+    );
+    if (!chatroom) {
+      throw new HttpException(
+        'not found chatroom or this chatroom have a owner',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return chatroom;
   }

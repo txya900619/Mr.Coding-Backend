@@ -6,6 +6,7 @@ import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { BindOwnerDto } from './dto/bind-owner.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { hash } from 'bcrypt';
+import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
 
 @Injectable()
 export class ChatRoomsService {
@@ -19,26 +20,22 @@ export class ChatRoomsService {
   async findAll(): Promise<ChatRoom[]> {
     return await this.chatroomModel.find().exec();
   }
-  async findOneByIdentify(identify: string): Promise<ChatRoom> {
-    const ChatRoom = await this.chatroomModel
-      .findOne({ identify: identify })
-      .exec();
-    return ChatRoom;
-  }
   async findOneByID(id: string): Promise<ChatRoom> {
     return await this.chatroomModel.findOne({ _id: id }).exec();
   }
   async bindOwnerToChatRoom(
-    id: string,
+    identify: string,
     bindOwnerDto: BindOwnerDto,
   ): Promise<ChatRoom> {
-    const testChatRoom = await this.chatroomModel.findOne({ _id: id }).exec();
+    const testChatRoom = await this.chatroomModel
+      .findOne({ identify: identify })
+      .exec();
     if (!testChatRoom || testChatRoom.owner) {
       return null;
     }
     bindOwnerDto.owner = await hash(bindOwnerDto.owner, 10); //hash user_id
     const chatroom = await this.chatroomModel.findByIdAndUpdate(
-      id,
+      { identify: identify },
       bindOwnerDto,
       { new: true },
     );
@@ -46,7 +43,10 @@ export class ChatRoomsService {
     return chatroom;
   }
 
-  async changeClosed(id: string, changeClosedDto: ChangeClosedDto) {
+  async changeClosed(
+    id: string,
+    changeClosedDto: ChangeClosedDto,
+  ): Promise<ChatRoom> {
     const chatroom = this.chatroomModel.findOne({ _id: id });
     if (!chatroom) {
       return null;
@@ -56,5 +56,18 @@ export class ChatRoomsService {
         new: true,
       })
       .exec();
+  }
+
+  async changeLineAccessToken(
+    id: string,
+    changeLineAccessToken: ChangeLineAccessTokenDto,
+  ): Promise<ChatRoom> {
+    return await this.chatroomModel.findByIdAndUpdate(
+      id,
+      changeLineAccessToken,
+      {
+        new: true,
+      },
+    );
   }
 }

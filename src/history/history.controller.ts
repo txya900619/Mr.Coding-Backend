@@ -30,7 +30,7 @@ export class HistoryController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
       if (userID !== (await this.chatroomsService.findOneByID(id)).owner) {
-        throw new HttpException('Unauthorized access', HttpStatus.UNAUTHORIZED);
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
     }
     const history = await this.historyService.findByIDAndTime(

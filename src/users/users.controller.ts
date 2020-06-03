@@ -27,7 +27,6 @@ export class UsersController {
 
   @Get(':id')
   async getUser(@Param('id') id) {
-    console.log(id);
     const user = await this.usersService.findOneByIDPublic(id);
     if (!user) {
       throw new HttpException(

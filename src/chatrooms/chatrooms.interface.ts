@@ -5,4 +5,5 @@ export interface ChatRoom extends Document {
   readonly owner: string;
   readonly identify: string;
   readonly closed: boolean;
+  readonly lineAccessToken: string;
 }
