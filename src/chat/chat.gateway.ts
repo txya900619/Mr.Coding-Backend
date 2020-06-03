@@ -41,12 +41,12 @@ export class ChatGateway {
       if (await compare(client.handshake.headers['userID'], chatroom.owner)) {
         throw new WsException('Unauthorized access');
       } // check user_id
-      client.username = client.handshake.headers['userID'];
+      client.userID = client.handshake.headers['userID'];
     } else {
-      if (!(await this.usersService.findOneByUsername(user.username))) {
+      if (!(await this.usersService.findOneByID(user._id))) {
         throw new WsException('Unauthorized access');
       }
-      client.username = user.username;
+      client.userID = user._id;
     }
     client.join(data);
   }
@@ -63,7 +63,7 @@ export class ChatGateway {
     const result = await this.historyService.createHistory(
       Object.keys(client.rooms)[1],
       data,
-      client.username,
+      client.userID,
     );
 
     this.server.sockets
@@ -82,7 +82,7 @@ export class ChatGateway {
     const readMessage = await this.chatService.readMessage(
       data,
       Object.keys(client.rooms)[1],
-      client.username,
+      client.userID,
     );
     if (!readMessage) {
       throw new WsException(

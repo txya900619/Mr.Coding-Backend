@@ -16,16 +16,24 @@ export class UsersService {
     return await this.usersModel.findOne({ username: username }).exec();
   }
 
-  async findAllPublic(): Promise<Users[]> {
-    return await this.usersModel.find().exec();
+  async findOneByID(id: string): Promise<Users> {
+    return await this.usersModel.findOne({ _id: id }).exec();
   }
 
-  async findOneByUsernamePublic(username: string): Promise<Users> {
+  async findOneByIDPublic(id: string): Promise<Users> {
     return await this.usersModel
-      .findOne({ username: username })
+      .findOne({ _id: id })
       .select('-password')
       .exec();
   }
+
+  async findAllPublic(): Promise<Users[]> {
+    return await this.usersModel
+      .find()
+      .select('-password')
+      .exec();
+  }
+
   async updateInfo(id: string, info: UpdateInfoDto): Promise<Users> {
     return await this.usersModel
       .findByIdAndUpdate(id, info, { new: true })

@@ -8,7 +8,6 @@ import {
   UseGuards,
   Request,
   Body,
-  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -20,14 +19,21 @@ import { UpdateCcDto } from './dto/update-cc.dto';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async getUser(@Query('username') username: string) {
-    if (!username) {
-      return await this.usersService.findAllPublic();
-    }
-    const user = await this.usersService.findOneByUsernamePublic(username);
+  async getUsers() {
+    return await this.usersService.findAllPublic();
+  }
+
+  @Get(':id')
+  async getUser(@Param('id') id) {
+    console.log(id);
+    const user = await this.usersService.findOneByIDPublic(id);
     if (!user) {
-      return [];
+      throw new HttpException(
+        'not found user match this id',
+        HttpStatus.NOT_FOUND,
+      );
     }
     return user;
   }
@@ -35,7 +41,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/info')
   async changeInfo(
-    @Param(':id') id: string,
+    @Param('id') id: string,
     @Request() req,
     @Body() updateInfoDto: UpdateInfoDto,
   ) {
@@ -51,7 +57,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/avatar')
   async changeAvatarUrl(
-    @Param(':id') id: string,
+    @Param('id') id: string,
     @Request() req,
     @Body() updateAvatarDto: UpdateAvatarDto,
   ) {
@@ -67,7 +73,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/cc')
   async changeCc(
-    @Param(':id') id: string,
+    @Param('id') id: string,
     @Request() req,
     @Body() updateCcDto: UpdateCcDto,
   ) {

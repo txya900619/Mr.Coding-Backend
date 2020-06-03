@@ -69,7 +69,7 @@ export class ChatRoomsController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/closed')
   async changeClosed(
-    @Param(':id') id,
+    @Param('id') id,
     @Body() changeClosedDto: ChangeClosedDto,
   ) {
     const chatroom = await this.chatroomsService.changeClosed(
