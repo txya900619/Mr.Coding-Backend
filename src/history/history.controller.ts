@@ -22,7 +22,7 @@ export class HistoryController {
     @Param('id') id: string,
     @Query('lastTime') lastTime: Date,
     @Query('number') number: number,
-    @Headers('userID') userID: string,
+    @Headers('userid') userID: string,
     @Authorization() user,
   ) {
     if (!user) {

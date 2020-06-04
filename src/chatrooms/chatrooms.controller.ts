@@ -35,9 +35,10 @@ export class ChatRoomsController {
   @Post() // need auth
   async createChatRoom(
     @Body() createChatRoomDto: CreateChatRoomDto,
-    @Headers('Authorization') auth,
+    @Headers('authorization') auth,
   ) {
-    if (auth !== (process.env.googleScriptAuth || 'cc')) {
+    console.log(auth);
+    if (auth != (process.env.googleScriptAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
     const chatroom = await this.chatroomsService.creat(createChatRoomDto);
