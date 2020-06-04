@@ -37,7 +37,6 @@ export class ChatRoomsController {
     @Body() createChatRoomDto: CreateChatRoomDto,
     @Headers('authorization') auth,
   ) {
-    console.log(auth);
     if (auth != (process.env.googleScriptAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
