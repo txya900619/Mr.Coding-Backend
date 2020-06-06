@@ -51,6 +51,9 @@ export class ChatGateway {
       client.userID = user._id;
     }
     client.join(data);
+    client.emit(
+      'successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub',
+    );
   }
 
   @SubscribeMessage('message')
