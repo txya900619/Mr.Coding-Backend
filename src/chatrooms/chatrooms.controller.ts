@@ -17,7 +17,6 @@ import { BindOwnerDto } from './dto/bind-owner.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
-import { async } from 'rxjs/internal/scheduler/async';
 import { compare } from 'bcrypt';
 import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
 
@@ -98,7 +97,10 @@ export class ChatRoomsController {
   }
 
   @Patch('identify/:identify/owner')
-  async bindOwner(@Param('identify') identify, @Body() bindOwnerDto: BindOwnerDto) {
+  async bindOwner(
+    @Param('identify') identify,
+    @Body() bindOwnerDto: BindOwnerDto,
+  ) {
     const chatroom = await this.chatroomsService.bindOwnerToChatRoom(
       identify,
       bindOwnerDto,

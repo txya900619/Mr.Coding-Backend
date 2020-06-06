@@ -6,6 +6,7 @@ import { LocalStrategy } from './local.strategy';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { config } from 'dotenv';
+import { JwtStrategy } from './jwt.strategy';
 
 config();
 
@@ -18,7 +19,7 @@ config();
       signOptions: { expiresIn: '20d' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtModule],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })
