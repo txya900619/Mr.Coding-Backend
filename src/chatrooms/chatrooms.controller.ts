@@ -98,7 +98,7 @@ export class ChatRoomsController {
   }
 
   @Patch('identify/:identify/owner')
-  async bindOwner(@Param('id') identify, @Body() bindOwnerDto: BindOwnerDto) {
+  async bindOwner(@Param('identify') identify, @Body() bindOwnerDto: BindOwnerDto) {
     const chatroom = await this.chatroomsService.bindOwnerToChatRoom(
       identify,
       bindOwnerDto,
