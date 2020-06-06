@@ -34,7 +34,7 @@ export class ChatRoomsService {
       return null;
     }
     bindOwnerDto.owner = await hash(bindOwnerDto.owner, 10); //hash user_id
-    const chatroom = await this.chatroomModel.findByIdAndUpdate(
+    const chatroom = await this.chatroomModel.findOneAndUpdate(
       { identify: identify },
       bindOwnerDto,
       { new: true },
