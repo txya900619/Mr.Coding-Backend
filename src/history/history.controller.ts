@@ -38,6 +38,7 @@ export class HistoryController {
       lastTime,
       Number(number),
     );
+
     return history;
   }
 }

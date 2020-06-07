@@ -65,8 +65,8 @@ export class ChatGateway {
     }
 
     const result = await this.historyService.createHistory(
-      Object.keys(client.rooms)[1],
       data,
+      Object.keys(client.rooms)[1],
       client.userID,
     );
 
