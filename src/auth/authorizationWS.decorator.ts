@@ -19,6 +19,7 @@ export const AuthorizationWS = createParamDecorator(
     if (!matches || matches[1] !== 'bearer') {
       return null;
     }
-    return jwt.verify(matches[2], process.env.JwtSecret || 'cc');
+    const payload: any = jwt.verify(matches[2], process.env.JwtSecret || 'cc');
+    return { _id: payload.sub, username: payload.username };
   },
 );
