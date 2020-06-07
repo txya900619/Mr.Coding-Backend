@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, isValidObjectId } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { BindOwnerDto } from './dto/bind-owner.dto';
@@ -21,6 +21,9 @@ export class ChatRoomsService {
     return await this.chatroomModel.find().exec();
   }
   async findOneByID(id: string): Promise<ChatRoom> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     return await this.chatroomModel.findOne({ _id: id }).exec();
   }
   async bindOwnerToChatRoom(
@@ -47,6 +50,9 @@ export class ChatRoomsService {
     id: string,
     changeClosedDto: ChangeClosedDto,
   ): Promise<ChatRoom> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     const chatroom = this.chatroomModel.findOne({ _id: id });
     if (!chatroom) {
       return null;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { Users } from './users.interface';
 import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
@@ -21,6 +21,9 @@ export class UsersService {
   }
 
   async findOneByIDPublic(id: string): Promise<Users> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     return await this.usersModel
       .findOne({ _id: id })
       .select('-password')

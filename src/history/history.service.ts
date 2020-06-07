@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { History } from './history.interface';
 
 @Injectable()
@@ -13,6 +13,9 @@ export class HistoryService {
     return creatHistory.save();
   }
   async findOneByID(id: string) {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     return await this.historyModel.findOne({ _id: id }).exec();
   }
   async findByIDAndTime(
