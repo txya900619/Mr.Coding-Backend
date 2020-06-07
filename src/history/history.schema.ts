@@ -25,5 +25,5 @@ export const HistorySchema = new mongoose.Schema(
       },
     },
   },
-  { timestamps: true, toJSON: { getters: true } },
+  { timestamps: true, toJSON: { getters: true }, id: false },
 );
