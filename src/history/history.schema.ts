@@ -9,12 +9,18 @@ export const HistorySchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       get: (v: Date) => {
+        if (!v) {
+          return undefined;
+        }
         return v.getTime();
       },
     },
     updatedAt: {
       type: Date,
       get: (v: Date) => {
+        if (!v) {
+          return undefined;
+        }
         return v.getTime();
       },
     },
