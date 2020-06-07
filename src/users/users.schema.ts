@@ -1,7 +1,6 @@
 import * as mongoose from 'mongoose';
 
 export const UsersSchema = new mongoose.Schema({
-  _id: String,
   username: String,
   password: String,
   avatar: { type: String, default: '' }, // need default img
