@@ -6,6 +6,18 @@ export const HistorySchema = new mongoose.Schema(
     chatroomID: String,
     author: String,
     read: { type: Boolean, default: false },
+    createdAt: {
+      type: Date,
+      get: (v: Date) => {
+        return v.getTime();
+      },
+    },
+    updatedAt: {
+      type: Date,
+      get: (v: Date) => {
+        return v.getTime();
+      },
+    },
   },
-  { timestamps: true },
+  { timestamps: true, toJSON: { getters: true } },
 );
