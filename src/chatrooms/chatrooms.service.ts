@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { BindOwnerDto } from './dto/bind-owner.dto';

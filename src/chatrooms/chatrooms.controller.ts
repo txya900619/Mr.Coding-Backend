@@ -47,7 +47,7 @@ export class ChatRoomsController {
   }
 
   @Get(':id')
-  async getChatroom(@Param('id') id) {
+  async getChatroom(@Param('id') id: string) {
     const chatroom = await this.chatroomsService.findOneByID(id);
     if (!chatroom) {
       throw new HttpException(
