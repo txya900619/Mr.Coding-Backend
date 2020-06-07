@@ -8,13 +8,12 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { ChatService } from './chat.service';
-import { Authorization } from 'src/auth/authorization.decorator';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { UsersService } from 'src/users/users.service';
 import { ExtendedSocket } from './extendedSocket.interface';
 import { HistoryService } from 'src/history/history.service';
 import { compare } from 'bcrypt';
-
+import { AuthorizationWS } from 'src/auth/authorizationWS.decorator';
 @WebSocketGateway()
 export class ChatGateway {
   constructor(
@@ -30,7 +29,7 @@ export class ChatGateway {
   async handleJoin(
     @MessageBody() data: string,
     @ConnectedSocket() client: ExtendedSocket,
-    @Authorization() user: any,
+    @AuthorizationWS() user: any,
   ) {
     if (!user) {
       if (!client.handshake.headers['userID']) {
