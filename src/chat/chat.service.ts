@@ -11,6 +11,7 @@ export class ChatService {
   ) {}
 
   async readMessage(
+    //TODO: change this function to read an range(time) of message, not read all
     id: string,
     chatroomId: string,
     user?: string,

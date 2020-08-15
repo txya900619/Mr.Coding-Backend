@@ -55,7 +55,7 @@ export class ChatGateway {
     );
   }
 
-  @SubscribeMessage('message')
+  @SubscribeMessage('message') //TODO: should delete this subscribe, because should use RESTful API to create new message
   async handleMessage(
     @MessageBody() data: string,
     @ConnectedSocket() client: ExtendedSocket,
@@ -72,10 +72,10 @@ export class ChatGateway {
 
     this.server.sockets
       .to(Object.keys(client.rooms)[1])
-      .emit('message', result);
+      .emit('message', result); //TODO: change this event to alarm client there has new message, so it should not take message body
   }
 
-  @SubscribeMessage('read')
+  @SubscribeMessage('read') //TODO: change read service from read all to split a small piece, maybe use RESTful API let client get which message read
   async readMessage(
     @MessageBody() data: string,
     @ConnectedSocket() client: ExtendedSocket,
