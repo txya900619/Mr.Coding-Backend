@@ -10,13 +10,13 @@ export class AppController {
     private readonly usersService: UsersService,
   ) {}
 
-  @Get()
+  @Get() //Local API test
   getHello(): string {
     return this.appService.getHello();
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('api/me')
+  @Get('api/me') //Get admin profile
   async getMe(@Req() req) {
     return await this.usersService.findOneByIDPublic(req.user._id);
   }

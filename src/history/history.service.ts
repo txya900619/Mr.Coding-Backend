@@ -19,9 +19,9 @@ export class HistoryService {
     return await this.historyModel.findOne({ _id: id }).exec();
   }
   async findByIDAndTime(
-    id: string,
-    lastTime?: Date,
-    number?: number,
+    id: string, //Chatroom id
+    lastTime?: Date, //Last message timestamp, this message will not include in return data
+    number?: number, //How many message want query
   ): Promise<History[]> {
     if (!number) {
       number = 0;

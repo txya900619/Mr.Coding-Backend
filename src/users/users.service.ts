@@ -21,6 +21,7 @@ export class UsersService {
   }
 
   async findOneByIDPublic(id: string): Promise<Users> {
+    //This function using on API, not include password in user profile
     if (!isValidObjectId(id)) {
       return null;
     }
@@ -31,6 +32,7 @@ export class UsersService {
   }
 
   async findAllPublic(): Promise<Users[]> {
+    //This function using on API, not include password in all user profile
     return await this.usersModel
       .find()
       .select('-password')

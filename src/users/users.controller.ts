@@ -20,12 +20,12 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Get() //Get all user profile, need admin authority(now all user is admin)
   async getUsers() {
     return await this.usersService.findAllPublic();
   }
 
-  @Get(':id')
+  @Get(':id') //Get specific user profile
   async getUser(@Param('id') id) {
     const user = await this.usersService.findOneByIDPublic(id);
     if (!user) {
@@ -38,7 +38,7 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':id/info')
+  @Patch(':id/info') //Change user info, only self can use
   async changeInfo(
     @Param('id') id: string,
     @Request() req,
@@ -54,7 +54,7 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':id/avatar')
+  @Patch(':id/avatar') //Change user avatar, only self can use
   async changeAvatarUrl(
     @Param('id') id: string,
     @Request() req,
@@ -70,7 +70,7 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':id/cc')
+  @Patch(':id/cc') //Change user cc(? , only self can use
   async changeCc(
     @Param('id') id: string,
     @Request() req,

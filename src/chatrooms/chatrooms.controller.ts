@@ -25,15 +25,16 @@ export class ChatRoomsController {
   constructor(private chatroomsService: ChatRoomsService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Get() //Get all chatroom, need admin authority
   async getChatRooms() {
     return await this.chatroomsService.findAll();
   }
 
-  @Post() // need auth
+  @Post() //Create new chatroom, only google script can use
   async createChatRoom(
+    //TODO: Change this function to fit line bot form service
     @Body() createChatRoomDto: CreateChatRoomDto,
-    @Headers('authorization') auth,
+    @Headers('authorization') auth, //google script's auth token,
   ) {
     if (auth != (process.env.googleScriptAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
@@ -45,7 +46,7 @@ export class ChatRoomsController {
     return chatroom;
   }
 
-  @Get(':id')
+  @Get(':id') //Get specific chatroom data
   async getChatroom(@Param('id') id: string) {
     const chatroom = await this.chatroomsService.findOneByID(id);
     if (!chatroom) {
@@ -57,7 +58,7 @@ export class ChatRoomsController {
     return chatroom;
   }
 
-  @Patch(':id/lineAccessToken')
+  @Patch(':id/lineAccessToken') //This is use to save line user data(? , I think this function not need
   async updateLineAccessToken(
     @Param() id,
     @Headers('userID') userID,
@@ -80,7 +81,7 @@ export class ChatRoomsController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Patch(':id/closed')
+  @Patch(':id/closed') //Close the chatroom
   async changeClosed(
     @Param('id') id,
     @Body() changeClosedDto: ChangeClosedDto,

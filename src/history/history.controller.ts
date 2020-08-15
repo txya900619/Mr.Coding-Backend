@@ -17,15 +17,16 @@ export class HistoryController {
     private historyService: HistoryService,
     private chatroomsService: ChatRoomsService,
   ) {}
-  @Get(':id/history')
+  @Get(':id/history') //Get history by last message's timestamp
   async getHistory(
-    @Param('id') id: string,
-    @Query('lastTime') lastTime: Date,
-    @Query('number') number: number,
-    @Headers('userid') userID: string,
-    @Authorization() user,
+    @Param('id') id: string, //Chatroom ID
+    @Query('lastTime') lastTime: Date, //Last message's timestamp
+    @Query('number') number: number, //How many message want query
+    @Headers('userid') userID: string, //Common user's line user_id
+    @Authorization() user, //Authorization user's JWT
   ) {
     if (!user) {
+      //if user authorization fail, check if header has userid
       if (!userID) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }

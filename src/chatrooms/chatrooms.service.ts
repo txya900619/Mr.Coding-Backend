@@ -27,7 +27,7 @@ export class ChatRoomsService {
     return await this.chatroomModel.findOne({ _id: id }).exec();
   }
   async bindOwnerToChatRoom(
-    identify: string,
+    identify: string, //Chatroom specific identify create by google script
     bindOwnerDto: BindOwnerDto,
   ): Promise<ChatRoom> {
     const testChatRoom = await this.chatroomModel
