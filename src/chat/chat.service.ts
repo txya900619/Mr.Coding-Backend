@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { HistoryService } from 'src/history/history.service';
-import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { History } from 'src/history/history.interface';
 
 @Injectable()
 export class ChatService {
-  constructor(
-    private historyService: HistoryService,
-    private chatroomService: ChatRoomsService,
-  ) {}
+  constructor(private historyService: HistoryService) {}
 
   async readMessage(
     //TODO: change this function to read an range(time) of message, not read all

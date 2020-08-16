@@ -8,5 +8,6 @@ import { UsersModule } from 'src/users/users.module';
 @Module({
   imports: [HistoryModule, ChatRoomModule, UsersModule],
   providers: [ChatGateway, ChatService],
+  exports: [ChatGateway],
 })
 export class ChatModule {}

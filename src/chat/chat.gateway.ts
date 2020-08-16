@@ -56,26 +56,6 @@ export class ChatGateway {
     );
   }
 
-  @SubscribeMessage('message') //TODO: should delete this subscribe, because should use RESTful API to create new message
-  async handleMessage(
-    @MessageBody() data: string,
-    @ConnectedSocket() client: ExtendedSocket,
-  ) {
-    if (Object.keys(client.rooms).length === 1) {
-      throw new WsException('should join room');
-    }
-
-    const result = await this.historyService.createHistory(
-      data,
-      Object.keys(client.rooms)[1],
-      client.userID,
-    );
-
-    this.server.sockets
-      .to(Object.keys(client.rooms)[1])
-      .emit('message', result); //TODO: change this event to alarm client there has new message, so it should not take message body
-  }
-
   @SubscribeMessage('read') //TODO: change read service from read all to split a small piece, maybe use RESTful API let client get which message read
   async readMessage(
     @MessageBody() data: string,
