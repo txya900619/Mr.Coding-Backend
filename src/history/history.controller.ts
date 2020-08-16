@@ -32,7 +32,7 @@ export class HistoryController {
     @Authorization() user, //Authorization user's JWT
   ) {
     if (!user) {
-      //if user authorization fail, check if header has userID
+      //If user authorization fail, check if header has userID
       if (!userID) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -51,7 +51,7 @@ export class HistoryController {
     return history;
   }
 
-  @Post(':chatroomID/message')
+  @Post(':chatroomID/message') //Add new message(history) and using socket.io to notify client that there has new message
   async createMessage(
     @Param('chatroomID') chatroomID: string,
     @Authorization() user,
@@ -59,7 +59,7 @@ export class HistoryController {
     @Body() createMessageDto: CreateMessageDto,
   ) {
     if (!user) {
-      //if user authorization fail, check if header has userID
+      //If user authorization fail, check if header has userID
       if (!userID) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -68,6 +68,8 @@ export class HistoryController {
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
+
+      //Create message and notify client
       const message = await this.historyService.createHistory(
         createMessageDto.context,
         chatroomID,
@@ -76,6 +78,8 @@ export class HistoryController {
       this.chatGateway.server.sockets.to(chatroomID).emit('message');
       return message;
     }
+
+    //Create message and notify client
     const message = await this.historyService.createHistory(
       createMessageDto.context,
       chatroomID,
@@ -85,14 +89,14 @@ export class HistoryController {
     return message;
   }
 
-  @Get(':chatroomID/message')
+  @Get(':chatroomID/message') //Get latest message in this chatroom
   async getLatestMessage(
     @Param('chatroomID') chatroomID: string,
     @Authorization() user,
     @Headers('userID') userID: string,
   ) {
     if (!user) {
-      //if user authorization fail, check if header has userID
+      //If user authorization fail, check if header has userID
       if (!userID) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
