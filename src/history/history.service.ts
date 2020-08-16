@@ -8,18 +8,22 @@ export class HistoryService {
   constructor(
     @InjectModel('History') private readonly historyModel: Model<History>,
   ) {}
+
   async createHistory(context: string, chatroomID: string, author: string) {
     const creatHistory = new this.historyModel({ context, chatroomID, author });
     return creatHistory.save();
   }
+
   async findOneByID(id: string) {
+    //This ID is history's _id auto create by mongoDB
     if (!isValidObjectId(id)) {
       return null;
     }
     return await this.historyModel.findOne({ _id: id }).exec();
   }
+
   async findByIDAndTime(
-    id: string, //Chatroom id
+    chatroomID: string, //This ID is chatroom's _id auto create by mongoDB, not chatroom identify
     lastTime?: Date, //Last message timestamp, this message will not include in return data
     number?: number, //How many message want query
   ): Promise<History[]> {
@@ -30,11 +34,13 @@ export class HistoryService {
       lastTime = new Date();
     }
     const history = await this.historyModel
-      .find({ chatroomID: id, createdAt: { $lt: lastTime } })
+      .find({ chatroomID: chatroomID, createdAt: { $lt: lastTime } })
       .limit(number);
     return history;
   }
+
   async updateReadToTrue(id: string): Promise<History> {
+    //TODO: need change
     let history: History;
     try {
       history = await this.historyModel.findByIdAndUpdate(

@@ -48,6 +48,7 @@ export class ChatRoomsController {
 
   @Get(':id') //Get specific chatroom data
   async getChatroom(@Param('id') id: string) {
+    //This ID is _id auto create by mongoDB, not chatroom identify
     const chatroom = await this.chatroomsService.findOneByID(id);
     if (!chatroom) {
       throw new HttpException(
@@ -58,9 +59,10 @@ export class ChatRoomsController {
     return chatroom;
   }
 
+  //TODO: This function not need(?)
   @Patch(':id/lineAccessToken') //This is use to save line user data(? , I think this function not need
   async updateLineAccessToken(
-    @Param() id,
+    @Param() id, //This ID is _id auto create by mongoDB, not chatroom identify
     @Headers('userID') userID,
     @Body() changeLineAccessTokenDto: ChangeLineAccessTokenDto,
   ) {
@@ -72,6 +74,7 @@ export class ChatRoomsController {
       );
     }
     if (!(await compare(userID, chatroom.owner))) {
+      //Compare function by bcrypt
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return await this.chatroomsService.changeLineAccessToken(
@@ -83,7 +86,7 @@ export class ChatRoomsController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/closed') //Close the chatroom
   async changeClosed(
-    @Param('id') id,
+    @Param('id') id, //This ID is _id auto create by mongoDB, not chatroom identify
     @Body() changeClosedDto: ChangeClosedDto,
   ) {
     const chatroom = await this.chatroomsService.changeClosed(

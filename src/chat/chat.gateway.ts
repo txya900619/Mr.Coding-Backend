@@ -22,12 +22,13 @@ export class ChatGateway {
     private usersService: UsersService,
     private historyService: HistoryService,
   ) {}
+
   @WebSocketServer()
   server: Server;
 
-  @SubscribeMessage('join')
+  @SubscribeMessage('join') //Join the socket.io's room by chatroom's _id
   async handleJoin(
-    @MessageBody() data: string,
+    @MessageBody() data: string, //chatroom's _id
     @ConnectedSocket() client: ExtendedSocket,
     @AuthorizationWS() user: any,
   ) {

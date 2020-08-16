@@ -2,8 +2,8 @@ import * as mongoose from 'mongoose';
 
 export const UsersSchema = new mongoose.Schema({
   username: String,
-  password: String,
-  avatar: { type: String, default: '' }, // need default img
+  password: String, //TODO: need hash
+  avatar: { type: String, default: '' }, //Need default img
   info: { type: String, default: '' },
-  cc: { type: Boolean, default: false },
+  cc: { type: Boolean, default: false }, //TU needed
 });

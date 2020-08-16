@@ -17,9 +17,10 @@ export class HistoryController {
     private historyService: HistoryService,
     private chatroomsService: ChatRoomsService,
   ) {}
-  @Get(':id/history') //Get history by last message's timestamp
+
+  @Get(':chatroomID/history') //Get history by last message's timestamp
   async getHistory(
-    @Param('id') id: string, //Chatroom ID
+    @Param('chatroomID') id: string, //This ID is chatroom's _id auto create by mongoDB, not chatroom identify
     @Query('lastTime') lastTime: Date, //Last message's timestamp
     @Query('number') number: number, //How many message want query
     @Headers('userid') userID: string, //Common user's line user_id

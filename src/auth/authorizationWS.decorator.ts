@@ -8,11 +8,13 @@ config();
 export const AuthorizationWS = createParamDecorator(
   (_, ctx: ExecutionContext) => {
     const client: ExtendedSocket = ctx.switchToWs().getClient();
+
     try {
       client.handshake.headers['authorization'].match(/(\S+)\s+(\S+)/);
     } catch (e) {
       return null;
     }
+
     const matches = client.handshake.headers['authorization'].match(
       /(\S+)\s+(\S+)/,
     );

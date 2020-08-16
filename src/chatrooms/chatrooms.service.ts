@@ -13,19 +13,24 @@ export class ChatRoomsService {
   constructor(
     @InjectModel('ChatRoom') private readonly chatroomModel: Model<ChatRoom>,
   ) {}
+
   async creat(creatChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
     const createdChatRoom = new this.chatroomModel(creatChatRoomDto);
     return await createdChatRoom.save();
   }
+
   async findAll(): Promise<ChatRoom[]> {
     return await this.chatroomModel.find().exec();
   }
+
   async findOneByID(id: string): Promise<ChatRoom> {
+    //This ID is _id auto create by mongoDB, not chatroom identify
     if (!isValidObjectId(id)) {
       return null;
     }
     return await this.chatroomModel.findOne({ _id: id }).exec();
   }
+
   async bindOwnerToChatRoom(
     identify: string, //Chatroom specific identify create by google script
     bindOwnerDto: BindOwnerDto,
@@ -36,7 +41,7 @@ export class ChatRoomsService {
     if (!testChatRoom || testChatRoom.owner) {
       return null;
     }
-    bindOwnerDto.owner = await hash(bindOwnerDto.owner, 10); //hash user_id
+    bindOwnerDto.owner = await hash(bindOwnerDto.owner, 10); //Hash user_id by bcrypt.js
     const chatroom = await this.chatroomModel.findOneAndUpdate(
       { identify: identify },
       bindOwnerDto,
@@ -47,7 +52,7 @@ export class ChatRoomsService {
   }
 
   async changeClosed(
-    id: string,
+    id: string, //This ID is _id auto create by mongoDB, not chatroom identify
     changeClosedDto: ChangeClosedDto,
   ): Promise<ChatRoom> {
     if (!isValidObjectId(id)) {
@@ -65,15 +70,13 @@ export class ChatRoomsService {
   }
 
   async changeLineAccessToken(
-    id: string,
+    id: string, //This ID is _id auto create by mongoDB, not chatroom identify
     changeLineAccessToken: ChangeLineAccessTokenDto,
   ): Promise<ChatRoom> {
-    return await this.chatroomModel.findByIdAndUpdate(
-      id,
-      changeLineAccessToken,
-      {
+    return await this.chatroomModel
+      .findByIdAndUpdate(id, changeLineAccessToken, {
         new: true,
-      },
-    );
+      })
+      .exec();
   }
 }
