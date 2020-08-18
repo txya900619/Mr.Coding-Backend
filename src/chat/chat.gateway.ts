@@ -7,7 +7,6 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { ChatService } from './chat.service';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { UsersService } from 'src/users/users.service';
 import { ExtendedSocket } from './extendedSocket.interface';
@@ -17,7 +16,6 @@ import { AuthorizationWS } from 'src/auth/authorizationWS.decorator';
 @WebSocketGateway()
 export class ChatGateway {
   constructor(
-    private chatService: ChatService,
     private chatroomsService: ChatRoomsService,
     private usersService: UsersService,
     private historyService: HistoryService,
@@ -54,29 +52,5 @@ export class ChatGateway {
     client.emit(
       'successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub',
     );
-  }
-
-  @SubscribeMessage('read') //TODO: change read service from read all to split a small piece, maybe use RESTful API let client get which message read
-  async readMessage(
-    @MessageBody() data: string,
-    @ConnectedSocket() client: ExtendedSocket,
-  ) {
-    if (Object.keys(client.rooms).length === 1) {
-      throw new WsException('should join room');
-    }
-    const readMessage = await this.chatService.readMessage(
-      data,
-      Object.keys(client.rooms)[1],
-      client.userID,
-    );
-    if (!readMessage) {
-      throw new WsException(
-        "this account can't read this message or can't find message",
-      );
-    }
-
-    this.server.sockets
-      .to(Object.keys(client.rooms)[1])
-      .emit('read', readMessage);
   }
 }

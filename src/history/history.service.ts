@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId } from 'mongoose';
+import { Model, isValidObjectId, Query } from 'mongoose';
 import { History } from './history.interface';
 
 @Injectable()
@@ -52,18 +52,53 @@ export class HistoryService {
     return history;
   }
 
-  async updateReadToTrue(id: string): Promise<History> {
+  async readMessage(
+    chatroomID: string,
+    userID: string,
+    lastMessageID: string,
+  ): Promise<{ _id: string }[]> {
     //TODO: need change
-    let history: History;
-    try {
-      history = await this.historyModel.findByIdAndUpdate(
-        id,
-        { read: true },
-        { new: true },
-      );
-    } catch (e) {
-      return null;
-    }
+    const lastMessageCreateAt = (
+      await this.historyModel.findOne({ _id: lastMessageID }).exec()
+    ).createdAt;
+
+    const updateResult = await this.historyModel
+      .updateMany(
+        {
+          author: { $ne: userID },
+          chatroomID: chatroomID,
+          createdAt: { $lte: lastMessageCreateAt },
+        },
+        { $set: { read: true } },
+        { multi: true },
+      )
+      .exec();
+
+    const history = await this.historyModel
+      .find({
+        author: { $ne: userID },
+        chatroomID: chatroomID,
+        createdAt: { $lte: lastMessageCreateAt },
+      })
+      .select('_id')
+      .sort({ _id: -1 })
+      .limit(updateResult.nModified)
+      .exec();
+
     return history;
+  }
+
+  async getLatestReadMessage(
+    chatroomID: string,
+    userID: string,
+  ): Promise<{ _id: string }> {
+    const latestReadMessage = await this.historyModel
+      .findOne({ chatroomID: chatroomID, author: userID, read: true })
+      .select('_id')
+      .sort({ _id: -1 })
+      .limit(1)
+      .exec();
+
+    return latestReadMessage;
   }
 }

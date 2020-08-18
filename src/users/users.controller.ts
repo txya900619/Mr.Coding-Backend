@@ -15,7 +15,7 @@ import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
 
-@Controller('api/users') //TODO: need POST controller for create user
+@Controller('api/users') //TODO: need POST to create user
 export class UsersController {
   constructor(private usersService: UsersService) {}
 

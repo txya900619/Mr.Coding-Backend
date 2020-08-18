@@ -8,12 +8,14 @@ import {
   Headers,
   Post,
   Body,
+  Patch,
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { Authorization } from 'src/auth/authorization.decorator';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { ChatGateway } from 'src/chat/chat.gateway';
+import { ReadMessageDto } from './dto/read-message.dto';
 
 @Controller('api/chatrooms')
 export class HistoryController {
@@ -73,7 +75,7 @@ export class HistoryController {
       const message = await this.historyService.createHistory(
         createMessageDto.context,
         chatroomID,
-        userID,
+        userID, //TODO: maybe need bcrypt
       );
       this.chatGateway.server.sockets.to(chatroomID).emit('message');
       return message;
@@ -109,5 +111,72 @@ export class HistoryController {
 
     const latestMessage = await this.historyService.findLatestOne(chatroomID);
     return latestMessage;
+  }
+
+  @Patch(':chatroomID/history/lastRead')
+  async readMessage(
+    @Param('chatroomID') chatroomID: string,
+    @Authorization() user,
+    @Headers('userID') userID: string,
+    @Body() readMessageDto: ReadMessageDto,
+  ) {
+    if (!user) {
+      //If user authorization fail, check if header has userID
+      if (!userID) {
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+      if (
+        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+      ) {
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+    } else {
+      userID = user._id;
+    }
+
+    if (
+      userID ==
+      (await this.historyService.findOneByID(readMessageDto.messageID)).author
+    ) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    const readMessages = await this.historyService.readMessage(
+      chatroomID,
+      userID,
+      readMessageDto.messageID,
+    );
+
+    this.chatGateway.server.sockets.to(chatroomID).emit('read');
+
+    return readMessages;
+  }
+
+  @Get(':chatroomID/history/lastRead')
+  async getLatestReadMessageID(
+    @Param('chatroomID') chatroomID: string,
+    @Authorization() user,
+    @Headers('userID') userID: string,
+  ) {
+    if (!user) {
+      //If user authorization fail, check if header has userID
+      if (!userID) {
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+      if (
+        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+      ) {
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+    } else {
+      userID = user._id;
+    }
+
+    const latestReadMessageID = this.historyService.getLatestReadMessage(
+      chatroomID,
+      userID,
+    );
+
+    return latestReadMessageID;
   }
 }
