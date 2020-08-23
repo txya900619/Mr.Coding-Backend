@@ -8,14 +8,18 @@ import {
   UseGuards,
   Request,
   Body,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { config } from 'dotenv/types';
 
-@Controller('api/users') //TODO: need POST to create user
+config();
+@Controller('api/users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
@@ -33,6 +37,34 @@ export class UsersController {
         'not found user match this id',
         HttpStatus.NOT_FOUND,
       );
+    }
+    return user;
+  }
+
+  @Post('default')
+  async createDefaultUser() {
+    const user = this.usersService.create(
+      new CreateUserDto(
+        process.env.DefaultAdminName,
+        process.env.DefaultAdminPassword,
+      ),
+    );
+    if (!user) {
+      throw new HttpException(
+        'Default user has created',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return user;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id')
+  async createUser(@Param('id') id, @Body() createUserDto: CreateUserDto) {
+    const user = this.usersService.create(createUserDto);
+    if (!user) {
+      throw new HttpException('Username duplicate', HttpStatus.BAD_REQUEST);
     }
     return user;
   }

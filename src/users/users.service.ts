@@ -5,12 +5,29 @@ import { Users } from './users.interface';
 import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { hashSync } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel('Users') private readonly usersModel: Model<Users>,
   ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<Users> {
+    if (this.usersModel.find({ username: createUserDto.username })) {
+      return null;
+    }
+
+    createUserDto.password = hashSync(createUserDto.password, 10);
+    const createdUser = new this.usersModel(createUserDto);
+    await createdUser.save();
+
+    return await this.usersModel
+      .findOne({ username: createUserDto.username })
+      .select('-password')
+      .exec();
+  }
 
   async findOneByUsername(username: string): Promise<Users> {
     return await this.usersModel.findOne({ username: username }).exec();

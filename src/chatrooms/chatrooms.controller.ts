@@ -16,7 +16,6 @@ import { BindOwnerDto } from './dto/bind-owner.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
-import { compare } from 'bcrypt';
 import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
 
 config();
@@ -73,8 +72,7 @@ export class ChatRoomsController {
         HttpStatus.NOT_FOUND,
       );
     }
-    if (!(await compare(userID, chatroom.owner))) {
-      //Compare function by bcrypt
+    if (userID !== chatroom.owner) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return await this.chatroomsService.changeLineAccessToken(

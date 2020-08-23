@@ -3,6 +3,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { config } from 'dotenv';
 import { Users } from 'src/users/users.interface';
+import { compareSync } from 'bcrypt';
 
 config();
 @Injectable()
@@ -14,7 +15,7 @@ export class AuthService {
 
   async validateUser(username: string, unCheckPassword: string): Promise<any> {
     const user = await this.usersService.findOneByUsername(username);
-    if (!user || user.password !== unCheckPassword) {
+    if (!user || !compareSync(unCheckPassword, user.password)) {
       return null;
     }
     return user;

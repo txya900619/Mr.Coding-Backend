@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, isValidObjectId, Query } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { History } from './history.interface';
 
 @Injectable()

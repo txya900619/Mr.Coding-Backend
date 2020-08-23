@@ -11,7 +11,6 @@ import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { UsersService } from 'src/users/users.service';
 import { ExtendedSocket } from './extendedSocket.interface';
 import { HistoryService } from 'src/history/history.service';
-import { compare } from 'bcrypt';
 import { AuthorizationWS } from 'src/auth/authorizationWS.decorator';
 @WebSocketGateway()
 export class ChatGateway {
@@ -36,9 +35,7 @@ export class ChatGateway {
       }
       const chatroom = await this.chatroomsService.findOneByID(data);
 
-      if (
-        !(await compare(client.handshake.headers['userID'], chatroom.owner))
-      ) {
+      if (client.handshake.headers['userID'] !== chatroom.owner) {
         throw new WsException('Unauthorized access');
       } // check user_id
       client.userID = client.handshake.headers['userID'];
