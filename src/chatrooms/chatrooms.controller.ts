@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { ChatRoomsService } from './chatrooms.service';
-import { BindOwnerDto } from './dto/bind-owner.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
@@ -31,11 +30,10 @@ export class ChatRoomsController {
 
   @Post() //Create new chatroom, only google script can use
   async createChatRoom(
-    //TODO: Change this function to fit line bot form service
     @Body() createChatRoomDto: CreateChatRoomDto,
     @Headers('authorization') auth, //google script's auth token,
   ) {
-    if (auth != (process.env.googleScriptAuth || 'cc')) {
+    if (auth != (process.env.lineBotAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
     const chatroom = await this.chatroomsService.creat(createChatRoomDto);
@@ -93,24 +91,6 @@ export class ChatRoomsController {
     );
     if (!chatroom) {
       throw new HttpException('not found chatroom', HttpStatus.NOT_FOUND);
-    }
-    return chatroom;
-  }
-
-  @Patch('identify/:identify/owner')
-  async bindOwner(
-    @Param('identify') identify,
-    @Body() bindOwnerDto: BindOwnerDto,
-  ) {
-    const chatroom = await this.chatroomsService.bindOwnerToChatRoom(
-      identify,
-      bindOwnerDto,
-    );
-    if (!chatroom) {
-      throw new HttpException(
-        'not found chatroom or this chatroom have a owner',
-        HttpStatus.BAD_REQUEST,
-      );
     }
     return chatroom;
   }

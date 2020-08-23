@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
-import { BindOwnerDto } from './dto/bind-owner.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
 
@@ -28,25 +27,6 @@ export class ChatRoomsService {
       return null;
     }
     return await this.chatroomModel.findOne({ _id: id }).exec();
-  }
-
-  async bindOwnerToChatRoom(
-    identify: string, //Chatroom specific identify create by google script
-    bindOwnerDto: BindOwnerDto,
-  ): Promise<ChatRoom> {
-    const testChatRoom = await this.chatroomModel
-      .findOne({ identify: identify })
-      .exec();
-    if (!testChatRoom || testChatRoom.owner) {
-      return null;
-    }
-    const chatroom = await this.chatroomModel.findOneAndUpdate(
-      { identify: identify },
-      bindOwnerDto,
-      { new: true },
-    );
-
-    return chatroom;
   }
 
   async changeClosed(

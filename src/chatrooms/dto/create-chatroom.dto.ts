@@ -1,3 +1,3 @@
 export class CreateChatRoomDto {
-  identify: string;
+  owner: string;
 }
