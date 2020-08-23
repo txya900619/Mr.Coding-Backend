@@ -16,7 +16,7 @@ import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { config } from 'dotenv/types';
+import { config } from 'dotenv';
 
 config();
 @Controller('api/users')
