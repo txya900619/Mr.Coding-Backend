@@ -57,7 +57,6 @@ export class HistoryService {
     userID: string,
     lastMessageID: string,
   ): Promise<{ _id: string }[]> {
-    //TODO: need change
     const lastMessageCreateAt = (
       await this.historyModel.findOne({ _id: lastMessageID }).exec()
     ).createdAt;

@@ -75,7 +75,7 @@ export class HistoryController {
       const message = await this.historyService.createHistory(
         createMessageDto.context,
         chatroomID,
-        userID, //TODO: maybe need bcrypt
+        userID,
       );
       this.chatGateway.server.sockets.to(chatroomID).emit('message');
       return message;
