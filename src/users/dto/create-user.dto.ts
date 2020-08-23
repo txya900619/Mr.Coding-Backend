@@ -1,5 +1,3 @@
-import { userInfo } from 'os';
-
 export class CreateUserDto {
   constructor(username: string, password: string) {
     this.username = username;

@@ -60,8 +60,8 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post(':id')
-  async createUser(@Param('id') id, @Body() createUserDto: CreateUserDto) {
+  @Post()
+  async createUser(@Body() createUserDto: CreateUserDto) {
     const user = this.usersService.create(createUserDto);
     if (!user) {
       throw new HttpException('Username duplicate', HttpStatus.BAD_REQUEST);
