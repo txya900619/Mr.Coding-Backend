@@ -15,7 +15,10 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    if (this.usersModel.find({ username: createUserDto.username })) {
+    console.log(
+      await this.usersModel.find({ username: createUserDto.username }).exec(),
+    );
+    if (await this.usersModel.exists({ username: createUserDto.username })) {
       return null;
     }
 

@@ -43,12 +43,13 @@ export class UsersController {
 
   @Post('default')
   async createDefaultUser() {
-    const user = this.usersService.create(
+    const user = await this.usersService.create(
       new CreateUserDto(
         process.env.DefaultAdminName,
         process.env.DefaultAdminPassword,
       ),
     );
+
     if (!user) {
       throw new HttpException(
         'Default user has created',
