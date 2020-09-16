@@ -72,7 +72,7 @@ export class ChatRoomsController {
     return chatroom;
   }
 
-  @Patch(':id/owner/liffUserID')
+  @Patch(':id/liffUserID')
   async bindLiffUserID(
     @Param('id') id,
     @Body() bindLiffUserIDDto: BindLiffUserIDDto,
