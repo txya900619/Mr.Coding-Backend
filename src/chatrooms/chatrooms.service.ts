@@ -4,7 +4,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
-import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
+import { BindLiffUserIDDto } from './dto/bindLiffUserID';
 
 @Injectable()
 export class ChatRoomsService {
@@ -12,7 +12,7 @@ export class ChatRoomsService {
     @InjectModel('ChatRoom') private readonly chatroomModel: Model<ChatRoom>,
   ) {}
 
-  async creat(creatChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
+  async create(creatChatRoomDto: CreateChatRoomDto): Promise<ChatRoom> {
     const createdChatRoom = new this.chatroomModel(creatChatRoomDto);
     return await createdChatRoom.save();
   }
@@ -47,12 +47,23 @@ export class ChatRoomsService {
       .exec();
   }
 
-  async changeLineAccessToken(
-    id: string, //This ID is _id auto create by mongoDB, not chatroom identify
-    changeLineAccessToken: ChangeLineAccessTokenDto,
+  //TODO: need auth
+  async changeLiffUserID(
+    id: string,
+    bindLiffUserID: BindLiffUserIDDto,
   ): Promise<ChatRoom> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    const chatroom = await this.chatroomModel.findOne({ _id: id });
+    if (!chatroom) {
+      return null;
+    }
+    if (chatroom.liffUserID != '') {
+      return null;
+    }
     return await this.chatroomModel
-      .findByIdAndUpdate(id, changeLineAccessToken, {
+      .findByIdAndUpdate(id, bindLiffUserID, {
         new: true,
       })
       .exec();

@@ -39,7 +39,8 @@ export class HistoryController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
       if (
-        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+        userID !==
+        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -66,7 +67,8 @@ export class HistoryController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
       if (
-        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+        userID !==
+        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -103,7 +105,8 @@ export class HistoryController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
       if (
-        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+        userID !==
+        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -126,7 +129,8 @@ export class HistoryController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
       if (
-        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+        userID !==
+        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -164,7 +168,8 @@ export class HistoryController {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
       if (
-        userID !== (await this.chatroomsService.findOneByID(chatroomID)).owner
+        userID !==
+        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }

@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 
 export const ChatRoomSchema = new mongoose.Schema({
-  owner: String,
+  lineChatroomUserID: { type: String, default: '' },
+  liffUserID: { type: String, default: '' },
   closed: { type: Boolean, default: false },
-  lineAccessToken: { type: String, default: '' },
 });

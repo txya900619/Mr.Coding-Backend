@@ -15,7 +15,7 @@ import { ChatRoomsService } from './chatrooms.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
-import { ChangeLineAccessTokenDto } from './dto/change-line-access-token.dto';
+import { BindLiffUserIDDto } from './dto/bindLiffUserID';
 
 config();
 @Controller('api/chatrooms')
@@ -36,7 +36,7 @@ export class ChatRoomsController {
     if (auth != (process.env.LineBotAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
-    const chatroom = await this.chatroomsService.creat(createChatRoomDto);
+    const chatroom = await this.chatroomsService.create(createChatRoomDto);
     if (!chatroom) {
       throw new HttpException('chatroom crate error', HttpStatus.BAD_REQUEST);
     }
@@ -56,29 +56,6 @@ export class ChatRoomsController {
     return chatroom;
   }
 
-  //TODO: This function not need(?)
-  @Patch(':id/lineAccessToken') //This is use to save line user data(? , I think this function not need
-  async updateLineAccessToken(
-    @Param() id, //This ID is _id auto create by mongoDB, not chatroom identify
-    @Headers('userID') userID,
-    @Body() changeLineAccessTokenDto: ChangeLineAccessTokenDto,
-  ) {
-    const chatroom = await this.chatroomsService.findOneByID(id);
-    if (!chatroom) {
-      throw new HttpException(
-        'not found chatroom match this id',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    if (userID !== chatroom.owner) {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
-    return await this.chatroomsService.changeLineAccessToken(
-      id,
-      changeLineAccessTokenDto,
-    );
-  }
-
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id/closed') //Close the chatroom
   async changeClosed(
@@ -92,6 +69,26 @@ export class ChatRoomsController {
     if (!chatroom) {
       throw new HttpException('not found chatroom', HttpStatus.NOT_FOUND);
     }
+    return chatroom;
+  }
+
+  @Patch(':id/owner/liffUserID')
+  async bindLiffUserID(
+    @Param('id') id,
+    @Body() bindLiffUserIDDto: BindLiffUserIDDto,
+  ) {
+    const chatroom = await this.chatroomsService.changeLiffUserID(
+      id,
+      bindLiffUserIDDto,
+    );
+
+    if (!chatroom) {
+      throw new HttpException(
+        'liffUserID bound, or chatroom not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return chatroom;
   }
 }
