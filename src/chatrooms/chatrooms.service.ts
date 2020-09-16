@@ -4,7 +4,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
-import { BindLiffUserIDDto } from './dto/bindLiffUserID';
+import { BindLiffUserIDDto } from './dto/bind-liff-userID';
 
 @Injectable()
 export class ChatRoomsService {

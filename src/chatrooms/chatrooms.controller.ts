@@ -15,7 +15,7 @@ import { ChatRoomsService } from './chatrooms.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
-import { BindLiffUserIDDto } from './dto/bindLiffUserID';
+import { BindLiffUserIDDto } from './dto/bind-liff-userID';
 
 config();
 @Controller('api/chatrooms')
