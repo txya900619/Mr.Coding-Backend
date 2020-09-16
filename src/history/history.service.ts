@@ -39,6 +39,7 @@ export class HistoryService {
     }
     const history = await this.historyModel
       .find({ chatroomID: chatroomID, createdAt: { $lt: lastTime } })
+      .sort({ _id: -1 })
       .limit(number);
     return history;
   }
