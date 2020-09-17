@@ -30,15 +30,15 @@ export class ChatGateway {
     @AuthorizationWS() user: any,
   ) {
     if (!user) {
-      if (!client.handshake.headers['userID']) {
+      if (!client.handshake.headers['userid']) {
         throw new WsException('Unauthorized access');
       }
       const chatroom = await this.chatroomsService.findOneByID(data);
 
-      if (client.handshake.headers['userID'] !== chatroom.liffUserID) {
+      if (client.handshake.headers['userid'] !== chatroom.liffUserID) {
         throw new WsException('Unauthorized access');
       } // check user_id
-      client.userID = client.handshake.headers['userID'];
+      client.userID = client.handshake.headers['userid'];
     } else {
       if (!(await this.usersService.findOneByID(user._id))) {
         throw new WsException('Unauthorized access');
