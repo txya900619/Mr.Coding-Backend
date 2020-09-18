@@ -3,8 +3,7 @@ HOST: https://mrcoding.org/api/
 
 # Mr.Coding
 
-Polls is a simple API allowing consumers to view polls and vote in them.
-
+cccccccc.
 
 # Group Chatrooms
 
@@ -15,7 +14,7 @@ Polls is a simple API allowing consumers to view polls and vote in them.
 
 + Request (application/json)
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin`, 用來驗證是否為 admin
     
     + Headers
     
@@ -96,7 +95,7 @@ Chatroom 是否已關閉
 
 + Request (application/json)
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin`, 用來驗證是否為 admin
 
     + Headers
     
@@ -168,22 +167,20 @@ Chatroom 是否已關閉
 + Request (application/json)
 
     從有限範圍取得 history, 
-    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
-    若身份為 common user 則在 userID 中帶上 line user_id,
+    在 Authorization 中帶上從`/authAdmin`或`/authLiff`取得的 JWT,
     回傳內容排序為新到舊
 
     + Headers
     
             Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
-            userID: xxxxxxxxx
-            
+
 + Response 200 (application/json)
 
     + Attributes (array[History])
     
 + Response 401 (application/json)
 
-    如果 jwt 跟 line user_id 都驗證失敗回傳
+    如果 jwt 驗證失敗回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -199,21 +196,19 @@ Chatroom 是否已關閉
 
 + Request (application/json)
 
-    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
-    若身份為 common user 則在 userID 中帶上 line user_id
+    在 Authorization 中帶上從`/authAdmin`或`/authLiff`取得的 JWT,
 
     + Headers
     
             Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
-            userID: xxxxxxxxx
-            
+
 + Response 200 (application/json)
 
     + Attributes (History)
     
 + Response 401 (application/json)
 
-    如果 jwt 跟 line user_id 都驗證失敗回傳
+    如果 jwt 驗證失敗回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -223,14 +218,12 @@ Chatroom 是否已關閉
 
 + Request (application/json)
 
-    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
-    若身份為 common user 則在 userID 中帶上 line user_id
+    在 Authorization 中帶上從`/authAdmin`或`/authLiff`取得的 JWT,
 
     + Headers
     
             Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
-            userID: xxxxxxxxx
-    
+
     + Attributes (History Base)
     
 + Response 200 (application/json)
@@ -239,7 +232,7 @@ Chatroom 是否已關閉
     
 + Response 401 (application/json)
 
-    如果 jwt 跟 line user_id 都驗證失敗回傳
+    如果 jwt 驗證失敗回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -255,15 +248,13 @@ Chatroom 是否已關閉
 
 + Request (application/json)
 
-    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
-    若身份為 common user 則在 userID 中帶上 line user_id,
+    在 Authorization 中帶上從`/authAdmin`或`/authLiff`取得的 JWT,
     請在收到 read 這個 socket.io event 之後立即呼叫,
     目的是取得自己發出的訊息中最後一個被讀取的
     
     + Headers 
     
             Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
-            userID: xxxxxxxxx
 
 + Response 200 (application/json)
 
@@ -271,7 +262,7 @@ Chatroom 是否已關閉
     
 + Response 401 (application/json)
 
-    如果 jwt 跟 line user_id 都驗證失敗回傳
+    如果 jwt 驗證失敗回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -281,15 +272,13 @@ Chatroom 是否已關閉
 
 + Request (application/json)
 
-    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
-    若身份為 common user 則在 userID 中帶上 line user_id,
+    在 Authorization 中帶上從`/authAdmin`或`/authLiff`取得的 JWT,
     成功的話會觸發 read 這個 socket.io event
     
     + Headers 
     
             Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
-            userID: xxxxxxxxx
-            
+
     + Attributes (object)
         + messageID: 5edce000b0171e5cee64aac1 (string) - the last message of messages what you want to read
         
@@ -299,7 +288,7 @@ Chatroom 是否已關閉
     
 + Response 401 (application/json)
 
-    如果 jwt 跟 line user_id 都驗證失敗回傳
+    如果 jwt 驗證失敗回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -309,7 +298,7 @@ Chatroom 是否已關閉
 
 # Group Auth
 
-## Auth [/auth]
+## Auth Admin [/authAdmin]
 
 ### Auth admin [POST]
 
@@ -334,6 +323,30 @@ Chatroom 是否已關閉
     + Attributes (object)
         + statusCode: 401 (number)
         + message: Unauthorized (string)
+        
+## Auth Liff User [/authLiff]
+
+### Auth Liff User [POST]
+
++ Request (application/json)
+
+    傳入 Liff Access Token 進行驗證(Line) 取得 jwt token 
+    > 會在 20 天後過期
+
+    + Attributes (object)
+        + liffAccessToken: rjnownowwn (string)
++ Response 201 (application/json)
+
+    + Attributes (object)
+        + token: 12213wdewtewdnvouen89werhfno23nr (string) - expire in 20 days
+                    
++ Response 401 (application/json)
+
+        如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
 
 # Group Users
 
@@ -345,7 +358,7 @@ Chatroom 是否已關閉
 
 + Request 
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin`, 用來驗證是否為 admin
 
     + Headers
     
@@ -469,9 +482,9 @@ Liff 的用戶資料 (普通用戶)
         + message: Not found user match this id (string)
         
         
-## User's Info [/users/{id}/info]
+## Admin User's Info [/users/{id}/info]
 
-user's info
+Admin User's info
 
 + Parameters 
 
@@ -481,7 +494,7 @@ user's info
 
 + Request (application/json)
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin`, 用來驗證是否為 admin
 
     + Headers
     
@@ -496,7 +509,7 @@ user's info
     
 + Response 401 (application/json)
 
-    如果 jwt 驗證沒過則回傳
+    如果 jwt 驗證沒過或沒有 admin 權限則回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -510,7 +523,7 @@ user's info
         + statusCode: 400 (number)
         + message: You can't change other's info (string)
     
-## User's Avatar [/users/{id}/avatar]
+## Admin User's Avatar [/users/{id}/avatar]
 
 user 的 avatar url
 
@@ -522,7 +535,7 @@ user 的 avatar url
 
 + Request (application/json)
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin`, 用來驗證是否為 admin
 
     + Headers
     
@@ -537,8 +550,7 @@ user 的 avatar url
     
 + Response 401 (application/json)
 
-    如果 jwt 驗證沒過則回傳
-
+    如果 jwt 驗證沒過或沒有 admin 權限則回傳
     + Attributes (object)
         + statusCode: 401 (number)
         + message: Unauthorized (string)
@@ -551,7 +563,7 @@ user 的 avatar url
         + statusCode: 400 (number)
         + message: You can't change other's info (string)
 
-## User's cc [/users/{id}/cc]
+## Admin User's cc [/users/{id}/cc]
 
 user's cc (?
 
@@ -563,7 +575,7 @@ user's cc (?
 
 + Request (application/json)
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin`, 用來驗證是否為 admin
 
     + Headers
     
@@ -578,7 +590,7 @@ user's cc (?
     
 + Response 401 (application/json)
 
-    如果 jwt 驗證沒過則回傳
+    如果 jwt 驗證沒過或沒有 admin 權限則回傳
 
     + Attributes (object)
         + statusCode: 401 (number)
@@ -600,7 +612,7 @@ user's cc (?
 
 + Request (application/json)
 
-    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    Authorization's token is from `/authAdmin` or `/authLiff`, 用來驗證是否為 admin 及 liff user
 
     + Headers
     
@@ -624,7 +636,7 @@ user's cc (?
 
 #### join
 
-- 傳 chatroomID, 驗證要帶 line user_id 在 header 或 api/auth 取得的 jwt 放在 Authorization header 記得最前面加 bearer
+- 傳 chatroomID, 驗證要帶 api/authAdmin 或 api/authLiff 取得的 jwt 放在 Authorization header 記得最前面加 bearer
 - 成功加入觸發　successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub, 如果沒有成功會觸發 exception event
 
 ## receive event
