@@ -1,0 +1,698 @@
+FORMAT: 1A
+HOST: https://mrcoding.org/api/
+
+# Mr.Coding
+
+Polls is a simple API allowing consumers to view polls and vote in them.
+
+
+# Group Chatrooms
+
+## Chatrooms Collection [/chatrooms]
+
+
+### List All Chatrooms [GET]
+
++ Request (application/json)
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+    
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+
++ Response 200 (application/json)
+
+    + Attributes (array[Chatroom])
+    
++ Response 401 (application/json)
+    
+    如果 jwt 驗證沒過則回傳
+     
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+    
+### Create New Chatrooms [POST]
+
++ Request (application/json)
+
+    此 Authorization 用來驗證是否為 line bot
+
+    + Headers
+    
+            Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
+            
+    + Attributes (Chatroom Base)
+
++ Response 201 (application/json)
+
+    + Attributes (Chatroom)
+    
++ Response 400 (application/json)
+
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: Chatroom crate error (string)
+    
++ Response 401 (application/json)
+
+    如果 Authorization Header 與約好的不同
+    
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Permission denied (string)
+        
+## Chatroom [/chatrooms/{id}]
+
++ Parameter
+
+    + id: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id
+    
+
+### Get Chatroom [GET]
+
++ Response 200 (application/json)
+
+    + Attributes (Chatroom)
+    
++ Response 404 (application/json)
+
+    if chatroom not found
+    
+    + Attributes (object)
+        + statusCode: 404 (number)
+        + message: Not found chatroom match this id (string)
+
+## Chatroom Closed [/chatrooms/{id}/closed]
+
+Chatroom 是否已關閉
+
++ Parameters
+
+    + id: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id
+    
+### Change Closed [PATCH]
+
++ Request (application/json)
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+    
+    + Attributes (object)
+        + closed: true (boolean)
+        
++ Response 200 (application/json)
+
+    + Attributes (Chatroom)
+    
++ Response 401 (application/json)
+
+    如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+
++ Response 404 (application/json)
+
+    if chatroom not found
+
+    + Attributes (object)
+        + statusCode: 404 (number)
+        + message: Not found chatroom (string)
+        
+## Chatroom liff user_id [/chatrooms/{id}/liffUserID]
+
+紀錄 chatroom 所屬用戶在 liff 的 user_id, 紀錄在 liff users 的 username
+
++ Parameters
+
+    + id: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id
+    
+### Change liff user_id [PATCH]
+
++ Request (application/json)
+
+    + Attributes (object)
+        + liffUserID: 5ed60065f25aea71fc09aafa (string)
+        
++ Response 200 (application/json)
+
+    + Attributes (Chatroom)
+    
++ Response 400 (application/json)
+
+    liffUserID bound, or chatroom not found
+
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: liffUserID bound, or chatroom not found (string)
+    
+
+# Group History
+
+## Chatroom's History Collection [/chatrooms/{id}/history{?lastTime,number}]
+
++ Parameter
+
+    + id: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id
+    + lastTime: 1591096367840 (optional, Date) - 最後一則 history 的時間 
+    + number: 12 (optional, number) - 取的 history 數量
+    
+### List Chatroom's History [GET]
+
++ Request (application/json)
+
+    從有限範圍取得 history, 
+    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
+    若身份為 common user 則在 userID 中帶上 line user_id,
+    回傳內容排序為新到舊
+
+    + Headers
+    
+            Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
+            userID: xxxxxxxxx
+            
++ Response 200 (application/json)
+
+    + Attributes (array[History])
+    
++ Response 401 (application/json)
+
+    如果 jwt 跟 line user_id 都驗證失敗回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
+## Lastest Message [/chatroom/{id}/message]
+
++ Parameter
+
+    + id: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id
+    
+### Get Latest Message [GET]
+
++ Request (application/json)
+
+    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
+    若身份為 common user 則在 userID 中帶上 line user_id
+
+    + Headers
+    
+            Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
+            userID: xxxxxxxxx
+            
++ Response 200 (application/json)
+
+    + Attributes (History)
+    
++ Response 401 (application/json)
+
+    如果 jwt 跟 line user_id 都驗證失敗回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
+### Send Message [POST]
+
++ Request (application/json)
+
+    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
+    若身份為 common user 則在 userID 中帶上 line user_id
+
+    + Headers
+    
+            Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
+            userID: xxxxxxxxx
+    
+    + Attributes (History Base)
+    
++ Response 200 (application/json)
+
+    + Attributes (History)
+    
++ Response 401 (application/json)
+
+    如果 jwt 跟 line user_id 都驗證失敗回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
+## LastRead Message [/chatroom/{id}/history/lastRead]
+
++ Parameter
+
+    + id: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id
+
+### GetLastReadMessage [GET]
+
++ Request (application/json)
+
+    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
+    若身份為 common user 則在 userID 中帶上 line user_id,
+    請在收到 read 這個 socket.io event 之後立即呼叫,
+    目的是取得自己發出的訊息中最後一個被讀取的
+    
+    + Headers 
+    
+            Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
+            userID: xxxxxxxxx
+
++ Response 200 (application/json)
+
+    + Attributes (Message Base)
+    
++ Response 401 (application/json)
+
+    如果 jwt 跟 line user_id 都驗證失敗回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+
+### ReadMessage [PATCH]
+
++ Request (application/json)
+
+    若身份為 admin 在 Authorization 中帶上從`/auth`取得的 JWT,
+    若身份為 common user 則在 userID 中帶上 line user_id,
+    成功的話會觸發 read 這個 socket.io event
+    
+    + Headers 
+    
+            Authorization: 5d9edbd93f660407e81ecfa7b2da7ff9a70da322
+            userID: xxxxxxxxx
+            
+    + Attributes (object)
+        + messageID: 5edce000b0171e5cee64aac1 (string) - the last message of messages what you want to read
+        
++ Response 200 (application/json)
+
+    + Attributes(array[Message Base])
+    
++ Response 401 (application/json)
+
+    如果 jwt 跟 line user_id 都驗證失敗回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
+
+
+# Group Auth
+
+## Auth [/auth]
+
+### Auth admin [POST]
+
++ Request (application/json)
+
+    傳入 username 與 password 進行登錄 取得 jwt token 
+    > 會在 20 天後過期
+
+    + Attributes (object)
+        + username: abc123 (string)
+        + password: cc (string)
+        
++ Response 201 (application/json)
+
+    + Attributes (object)
+        + token: 12213wdewtewdnvouen89werhfno23nr (string) - expire in 20 days
+                    
++ Response 401 (application/json)
+
+        如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+
+# Group Users
+
+## Users Collection [/users]
+
+所有 admin 的資訊
+
+### List Users [GET]
+
++ Request 
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+            
++ Response 200 (application/json)
+
+    + Attributes (array[User No Password])
+    
++ Response 401 (application/json)
+
+    如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
+## Admin User [/users/admin]
+
+管理員用戶，用有最高權限
+        
+### Create Admin [POST]
+
++ Request (application/json)
+    
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+            
+    + Attributes (User Base)
+    
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+            
++ Response 401 (application/json)
+    
+    如果 jwt 驗證沒過則回傳
+     
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
++ Response 400 (application/json)
+    
+    如果已存在使用此用戶名的用戶
+     
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: Username duplicate (string)
+
+## Liff User [/users/liff]
+
+Liff 的用戶資料 (普通用戶)
+
+### Create Liff User [POST]
+
++ Request (application/json)
+    
+    + Attributes (Liff User Base)
+    
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+            
++ Response 401 (application/json)
+    
+    如果 Line 驗證沒過則回傳
+     
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
++ Response 400 (application/json)
+    
+    如果已存在 username 等於此 line userID 的用戶
+     
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: Username duplicate (string)
+
+
+## Default User [/users/default]
+
+依照後端 .env 中的資訊建立的預設用戶
+
+### Create Default User [POST]
+
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+
++ Response 400 (application/json)
+
+    如果預設使用者已被建立
+
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: Default user has created (string)
+
+## User [/users/{id}]
+
++ Parameters 
+
+    + id: 5ed60065f25aea71fc09aafa (string) - user's _id
+
+### Get Specific User [GET]
+
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+    
++ Response 404 (application/json)
+
+    如果沒找到 user
+
+    + Attributes (object)
+        + statusCode: 404 (number)
+        + message: Not found user match this id (string)
+        
+        
+## User's Info [/users/{id}/info]
+
+user's info
+
++ Parameters 
+
+    + id: 5ed60065f25aea71fc09aafa (string) - user's _id
+
+### Change Info [PATCH]
+
++ Request (application/json)
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+            
+    + Attributes (object)
+        + info: ccccc (string)
+        
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+    
++ Response 401 (application/json)
+
+    如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+
++ Response 400 (application/json)
+
+    如果 jwt 驗證通過但用戶 id 不符合
+
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: You can't change other's info (string)
+    
+## User's Avatar [/users/{id}/avatar]
+
+user 的 avatar url
+
++ Parameters 
+
+    + id: 5ed60065f25aea71fc09aafa (string) - user's _id
+
+### Change Avatar [PATCH]
+
++ Request (application/json)
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+            
+    + Attributes (object)
+        + avatar: http://cccc.com (string)
+        
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+    
++ Response 401 (application/json)
+
+    如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+
++ Response 400 (application/json)
+
+    如果 jwt 驗證通過但用戶 id 不符合
+
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: You can't change other's info (string)
+
+## User's cc [/users/{id}/cc]
+
+user's cc (?
+
++ Parameters 
+
+    + id: 5ed60065f25aea71fc09aafa (string) - user's _id
+
+### Change CC [PATCH]
+
++ Request (application/json)
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+            
+    + Attributes (object)
+        + cc: true (boolean)
+        
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+    
++ Response 401 (application/json)
+
+    如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+
++ Response 400 (application/json)
+
+    如果 jwt 驗證通過但用戶 id 不符合
+
+    + Attributes (object)
+        + statusCode: 400 (number)
+        + message: You can't change other's info (string)
+
+## My User [/me]
+
+在此裝置登陸的 user(admin) 的資訊
+
+### Get My User [GET]
+
++ Request (application/json)
+
+    Authorization's token is from `/auth`, 用來驗證是否為 admin
+
+    + Headers
+    
+            Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndheW5lIiwic3ViIjoiNWVkNjAwNjVmMjVhZWE3MWZjMDlhYWZhIiwiaWF0IjoxNTk3NjUyNzIxLCJleHAiOjE1OTkzODA3MjF9.5d4lt2rNlhnEzwKzbMrV6F_DFNv-X4JF6Oqvnj6bC8o
+
++ Response 200 (application/json)
+
+    + Attributes (User No Password)
+    
++ Response 401 (application/json)
+
+    如果 jwt 驗證沒過則回傳
+
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: Unauthorized (string)
+        
+# Group Socket.io
+
+## send event
+
+#### join
+
+- 傳 chatroomID, 驗證要帶 line user_id 在 header 或 api/auth 取得的 jwt 放在 Authorization header 記得最前面加 bearer
+- 成功加入觸發　successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub, 如果沒有成功會觸發 exception event
+
+## receive event
+
+#### successfullyJoinedChatRoomOfMrCodingPlatformInNationalTaipeiUniversityOfTechnologyProgrammingClub
+
+- 成功加入 chatroom
+
+#### exception
+
+- 發生錯誤
+```json
+{
+    "status":"error",
+    "message":"Unauthorized access"
+}
+```
+
+#### message
+
+- notify client that this chatroom has new message
+
+
+# Data Structures
+
+## Chatroom Base (object)
+
++ lineChatroomUserID: eAeNC4seoDQ0vZwzgwYv3CxNcOdAql344Umxe3G (string, required) - line chatroom user's user_id
+
+
+## Chatroom (object)
+
++ closed: false (boolean)
++ _id: 5edb70c2db6fdff93f23d71e (string) - auto create by mongo
+
+## History Base (object)
+
++ context: uccu (string,required) - message body
+
+## History (History Base)
+
++ _id: 5edce000b0171e5cee64aac1 (string) - auto create by mongo
++ chatroomID: 5edb70c2db6fdff93f23d71e (string) - chatroom's _id where this message at
++ author: 5ed6000ff25aea71fc09aaf9 (string) - if this message is send by admin it's author will be this admin's _id, if is common user it's author is common user's line user_id
++ read: false (boolean)
++ createdAt: `2020-05-23T10:09:26.400Z` (string)
++ updatedAt: `2020-05-23T11:04:57.169Z` (string)
+
+## Liff User Base (object)
+
++ liffAccessToken: asdcnvsibnivsdbs3qr (string, required)
+
+## User Base (object)
+
++ username: abc123 (string, required)
++ password: ccccccc (string, required)
++ avatar: ``  (string)
++ info: I'm info (string)
++ cc: true (boolean)
+
+## User No Password(object)
+
++ _id: 5ed60065f25aea71fc09aafa (string) - auto create by mingo
++ username: abc123 (string)
++ avatar: ``  (string)
++ info: I'm info (string)
++ cc: true (boolean)
+
+## Message Base (object)
+
++ _id: 5edce000b0171e5cee64aac1 (string)
