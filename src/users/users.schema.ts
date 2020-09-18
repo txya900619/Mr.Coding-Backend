@@ -6,4 +6,5 @@ export const UsersSchema = new mongoose.Schema({
   avatar: { type: String, default: '' }, //Need default img
   info: { type: String, default: '' },
   cc: { type: Boolean, default: false }, //TU needed
+  admin: { type: Boolean, default: false },
 });

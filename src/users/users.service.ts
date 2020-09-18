@@ -5,7 +5,7 @@ import { Users } from './users.interface';
 import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 import { hashSync } from 'bcrypt';
 
 @Injectable()
@@ -14,20 +14,49 @@ export class UsersService {
     @InjectModel('Users') private readonly usersModel: Model<Users>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<Users> {
-    console.log(
-      await this.usersModel.find({ username: createUserDto.username }).exec(),
-    );
-    if (await this.usersModel.exists({ username: createUserDto.username })) {
+  async createAdmin(createAdminDto: CreateAdminDto): Promise<Users> {
+    if (await this.usersModel.exists({ username: createAdminDto.username })) {
       return null;
     }
 
-    createUserDto.password = hashSync(createUserDto.password, 10);
-    const createdUser = new this.usersModel(createUserDto);
-    await createdUser.save();
+    createAdminDto.password = hashSync(createAdminDto.password, 10);
+    const createdAdmin = new this.usersModel(createAdminDto);
+    await createdAdmin.save();
 
     return await this.usersModel
-      .findOne({ username: createUserDto.username })
+      .findOne({ username: createAdminDto.username })
+      .select('-password')
+      .exec();
+  }
+
+  async createLiffUser(liffUserProfile: {
+    displayName: string;
+    userId: string;
+    pictureUrl: string;
+    statusMessage: string;
+  }) {
+    if (
+      await this.usersModel.exists({
+        password: liffUserProfile.userId,
+        admin: false,
+      })
+    ) {
+      return null;
+    }
+
+    const createdLiffUser = new this.usersModel({
+      username: liffUserProfile.displayName,
+      password: liffUserProfile.userId,
+      avatar: liffUserProfile.pictureUrl,
+      info: liffUserProfile.statusMessage,
+    });
+    await createdLiffUser.save();
+
+    return await this.usersModel
+      .findOne({
+        admin: false,
+        password: liffUserProfile.userId,
+      })
       .select('-password')
       .exec();
   }

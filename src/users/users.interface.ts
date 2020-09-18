@@ -7,4 +7,5 @@ export interface Users extends Document {
   readonly avatar: string;
   readonly info: string;
   readonly cc: boolean; // TU needed
+  readonly admin: boolean;
 }

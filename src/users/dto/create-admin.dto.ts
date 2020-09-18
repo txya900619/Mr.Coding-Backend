@@ -1,4 +1,4 @@
-export class CreateUserDto {
+export class CreateAdminDto {
   constructor(username: string, password: string) {
     this.username = username;
     this.password = password;
@@ -8,4 +8,5 @@ export class CreateUserDto {
   avatar: string;
   info: string;
   cc: boolean;
+  admin = true;
 }

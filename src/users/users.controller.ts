@@ -9,19 +9,24 @@ import {
   Request,
   Body,
   Post,
+  HttpService,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
 import { config } from 'dotenv';
+import { CreateLiffUserDto } from './dto/create-liff-user.dto';
 
 config();
 @Controller('api/users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private httpService: HttpService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get() //Get all user profile, need admin authority(now all user is admin)
@@ -43,8 +48,8 @@ export class UsersController {
 
   @Post('default')
   async createDefaultUser() {
-    const user = await this.usersService.create(
-      new CreateUserDto(
+    const user = await this.usersService.createAdmin(
+      new CreateAdminDto(
         process.env.DefaultAdminName,
         process.env.DefaultAdminPassword,
       ),
@@ -61,11 +66,43 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    const user = this.usersService.create(createUserDto);
+  @Post('admin')
+  async createAdmin(@Body() createAdminDto: CreateAdminDto) {
+    const user = this.usersService.createAdmin(createAdminDto);
     if (!user) {
       throw new HttpException('Username duplicate', HttpStatus.BAD_REQUEST);
+    }
+    return user;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('liff')
+  async createLiffUser(@Body() createLiffUserDto: CreateLiffUserDto) {
+    let profile: {
+      displayName: string;
+      userId: string;
+      pictureUrl: string;
+      statusMessage: string;
+    };
+    try {
+      profile = (
+        await this.httpService
+          .get('https://api.line.me/v2/profile', {
+            headers: {
+              Authorization: `Bearer ${createLiffUserDto.lineAccessToken}`,
+            },
+          })
+          .toPromise()
+      ).data;
+    } catch (e) {
+      throw new HttpException(
+        'Line Access Token Unauthorized',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const user = await this.usersService.createLiffUser(profile);
+    if (!user) {
+      throw new HttpException('liff users duplicate', HttpStatus.BAD_REQUEST);
     }
     return user;
   }
