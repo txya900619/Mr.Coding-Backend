@@ -1,3 +1,3 @@
 export class CreateLiffUserDto {
-  lineAccessToken: string;
+  liffAccessToken: string;
 }

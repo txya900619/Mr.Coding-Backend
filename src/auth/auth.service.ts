@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { config } from 'dotenv';
@@ -13,11 +17,27 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, unCheckPassword: string): Promise<any> {
+  async validateAdmin(
+    username: string,
+    unCheckPassword: string,
+  ): Promise<Users> {
     const user = await this.usersService.findOneByUsername(username);
-    if (!user || !compareSync(unCheckPassword, user.password)) {
-      return null;
+    if (!user) {
+      throw new HttpException('Admin not found', 404);
     }
+    if (!compareSync(unCheckPassword, user.password)) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  async validateLiffUserAndUpsertProfile(profile: {
+    displayName: string;
+    userId: string;
+    pictureUrl: string;
+    statusMessage: string;
+  }): Promise<Users> {
+    const user = await this.usersService.upsertLiffUser(profile);
     return user;
   }
 

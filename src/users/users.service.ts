@@ -29,7 +29,7 @@ export class UsersService {
       .exec();
   }
 
-  async createLiffUser(liffUserProfile: {
+  async upsertLiffUser(liffUserProfile: {
     displayName: string;
     userId: string;
     pictureUrl: string;
@@ -41,7 +41,17 @@ export class UsersService {
         admin: false,
       })
     ) {
-      return null;
+      return await this.usersModel.findOneAndUpdate(
+        {
+          password: liffUserProfile.userId,
+          admin: false,
+        },
+        {
+          avatar: liffUserProfile.pictureUrl,
+          info: liffUserProfile.statusMessage,
+        },
+        { new: true },
+      );
     }
 
     const createdLiffUser = new this.usersModel({

@@ -76,38 +76,6 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('liff')
-  async createLiffUser(@Body() createLiffUserDto: CreateLiffUserDto) {
-    let profile: {
-      displayName: string;
-      userId: string;
-      pictureUrl: string;
-      statusMessage: string;
-    };
-    try {
-      profile = (
-        await this.httpService
-          .get('https://api.line.me/v2/profile', {
-            headers: {
-              Authorization: `Bearer ${createLiffUserDto.lineAccessToken}`,
-            },
-          })
-          .toPromise()
-      ).data;
-    } catch (e) {
-      throw new HttpException(
-        'Line Access Token Unauthorized',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    const user = await this.usersService.createLiffUser(profile);
-    if (!user) {
-      throw new HttpException('liff users duplicate', HttpStatus.BAD_REQUEST);
-    }
-    return user;
-  }
-
-  @UseGuards(AuthGuard('jwt'))
   @Patch(':id/info') //Change user info, only self can use
   async changeInfo(
     @Param('id') id: string,
