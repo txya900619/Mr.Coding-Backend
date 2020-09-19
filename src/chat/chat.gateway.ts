@@ -12,6 +12,7 @@ import { UsersService } from 'src/users/users.service';
 import { ExtendedSocket } from './extendedSocket.interface';
 import { HistoryService } from 'src/history/history.service';
 import { AuthorizationWS } from 'src/auth/authorizationWS.decorator';
+import { cachedDataVersionTag } from 'v8';
 @WebSocketGateway()
 export class ChatGateway {
   constructor(
@@ -30,20 +31,18 @@ export class ChatGateway {
     @AuthorizationWS() user: any,
   ) {
     if (!user) {
-      if (!client.handshake.headers['userid']) {
-        throw new WsException('Unauthorized access');
-      }
-      const chatroom = await this.chatroomsService.findOneByID(data);
-
-      if (client.handshake.headers['userid'] !== chatroom.liffUserID) {
-        throw new WsException('Unauthorized access');
-      } // check user_id
-      client.userID = client.handshake.headers['userid'];
+      throw new WsException('Unauthorized access');
     } else {
-      if (!(await this.usersService.findOneByID(user._id))) {
+      const userProfile = await this.usersService.findOneByID(user._id);
+      if (!userProfile) {
         throw new WsException('Unauthorized access');
       }
-      client.userID = user._id;
+      if (!userProfile.admin) {
+        const chatroom = await this.chatroomsService.findOneByID(data);
+        if (chatroom.liffUserID != userProfile.password) {
+          throw new WsException('Unauthorized access');
+        }
+      }
     }
     client.join(data);
     client.emit(

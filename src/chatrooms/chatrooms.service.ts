@@ -18,7 +18,10 @@ export class ChatRoomsService {
   }
 
   async findAll(): Promise<ChatRoom[]> {
-    return await this.chatroomModel.find().exec();
+    return await this.chatroomModel
+      .find()
+      .select('-lineChatroomUserID -liffUserID')
+      .exec();
   }
 
   async findOneByID(id: string): Promise<ChatRoom> {
@@ -27,6 +30,17 @@ export class ChatRoomsService {
       return null;
     }
     return await this.chatroomModel.findOne({ _id: id }).exec();
+  }
+
+  async findOneByIDWithoutUserID(id: string): Promise<ChatRoom> {
+    //This ID is _id auto create by mongoDB, not chatroom identify
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return await this.chatroomModel
+      .findOne({ _id: id })
+      .select('-lineChatroomUserID -liffUserID')
+      .exec();
   }
 
   async changeClosed(

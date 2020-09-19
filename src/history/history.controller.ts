@@ -40,7 +40,8 @@ export class HistoryController {
       }
       if (
         userID !==
-        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
+        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
+          .liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -68,7 +69,8 @@ export class HistoryController {
       }
       if (
         userID !==
-        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
+        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
+          .liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -106,7 +108,8 @@ export class HistoryController {
       }
       if (
         userID !==
-        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
+        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
+          .liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -130,7 +133,8 @@ export class HistoryController {
       }
       if (
         userID !==
-        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
+        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
+          .liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
@@ -169,7 +173,8 @@ export class HistoryController {
       }
       if (
         userID !==
-        (await this.chatroomsService.findOneByID(chatroomID)).liffUserID
+        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
+          .liffUserID
       ) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }

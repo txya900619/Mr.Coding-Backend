@@ -46,7 +46,7 @@ export class ChatRoomsController {
   @Get(':id') //Get specific chatroom data
   async getChatroom(@Param('id') id: string) {
     //This ID is _id auto create by mongoDB, not chatroom identify
-    const chatroom = await this.chatroomsService.findOneByID(id);
+    const chatroom = await this.chatroomsService.findOneByIDWithoutUserID(id);
     if (!chatroom) {
       throw new HttpException(
         'not found chatroom match this id',
