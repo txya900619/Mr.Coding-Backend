@@ -9,10 +9,14 @@ export class LiffLocalStrategy extends PassportStrategy(Strategy, 'liffLocal') {
     private authService: AuthService,
     private httpService: HttpService,
   ) {
-    super({ usernameField: 'liffAccessToken' });
+    super({
+      usernameField: 'liffAccessToken',
+      passwordField: 'liffAccessToken',
+    });
   }
 
-  async validate(username: string): Promise<any> {
+  async validate(liffAccessToken: string): Promise<any> {
+    console.log(liffAccessToken);
     // username === liffAccessToken
     let profile: {
       displayName: string;
@@ -26,7 +30,7 @@ export class LiffLocalStrategy extends PassportStrategy(Strategy, 'liffLocal') {
         await this.httpService
           .get('https://api.line.me/v2/profile', {
             headers: {
-              Authorization: `Bearer ${username}`,
+              Authorization: `Bearer ${liffAccessToken}`,
             },
           })
           .toPromise()
