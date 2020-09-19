@@ -18,15 +18,11 @@ import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { config } from 'dotenv';
-import { CreateLiffUserDto } from './dto/create-liff-user.dto';
 
 config();
 @Controller('api/users')
 export class UsersController {
-  constructor(
-    private usersService: UsersService,
-    private httpService: HttpService,
-  ) {}
+  constructor(private usersService: UsersService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get() //Get all user profile, need admin authority(now all user is admin)

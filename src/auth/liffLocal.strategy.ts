@@ -41,7 +41,7 @@ export class AdminLocalStrategy extends PassportStrategy(
     let user;
 
     try {
-      user = await this.authService.validateLiffUserAndUpsertProfile(profile);
+      user = await this.authService.upsertLiffUserProfile(profile);
     } catch (error) {
       throw error;
     }

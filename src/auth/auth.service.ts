@@ -31,7 +31,7 @@ export class AuthService {
     return user;
   }
 
-  async validateLiffUserAndUpsertProfile(profile: {
+  async upsertLiffUserProfile(profile: {
     displayName: string;
     userId: string;
     pictureUrl: string;

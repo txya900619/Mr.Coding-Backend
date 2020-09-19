@@ -41,17 +41,20 @@ export class UsersService {
         admin: false,
       })
     ) {
-      return await this.usersModel.findOneAndUpdate(
-        {
-          password: liffUserProfile.userId,
-          admin: false,
-        },
-        {
-          avatar: liffUserProfile.pictureUrl,
-          info: liffUserProfile.statusMessage,
-        },
-        { new: true },
-      );
+      return await this.usersModel
+        .findOneAndUpdate(
+          {
+            password: liffUserProfile.userId,
+            admin: false,
+          },
+          {
+            avatar: liffUserProfile.pictureUrl,
+            info: liffUserProfile.statusMessage,
+          },
+          { new: true },
+        )
+        .select('-password')
+        .exec();
     }
 
     const createdLiffUser = new this.usersModel({
