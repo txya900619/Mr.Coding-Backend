@@ -5,10 +5,10 @@ import {
   Param,
   HttpException,
   HttpStatus,
-  Headers,
   Post,
   Body,
   Patch,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { Authorization } from 'src/auth/authorization.decorator';
@@ -16,6 +16,7 @@ import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { ChatGateway } from 'src/chat/chat.gateway';
 import { ReadMessageDto } from './dto/read-message.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('api/chatrooms')
 export class HistoryController {
@@ -23,6 +24,7 @@ export class HistoryController {
     private historyService: HistoryService,
     private chatroomsService: ChatRoomsService,
     private chatGateway: ChatGateway,
+    private usersService: UsersService,
   ) {}
 
   @Get(':chatroomID/history') //Get history by last message's timestamp
@@ -30,20 +32,19 @@ export class HistoryController {
     @Param('chatroomID') chatroomID: string, //This ID is chatroom's _id auto create by mongoDB, not chatroom identify
     @Query('lastTime') lastTime: Date, //Last message's timestamp
     @Query('number') number: number, //How many message want query
-    @Headers('userID') userID: string, //Common user's line user_id
-    @Authorization() user, //Authorization user's JWT
+    @Authorization() user: { _id: string; username: string }, //Authorization user's JWT
   ) {
     if (!user) {
-      //If user authorization fail, check if header has userID
-      if (!userID) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
-      if (
-        userID !==
-        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
-          .liffUserID
-      ) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
+    }
+    const userProfile = await this.usersService.findOneByID(user._id);
+    const chatroom = await this.chatroomsService.findOneByID(chatroomID);
+    if (!userProfile) {
+      throw new UnauthorizedException();
+    }
+    if (!userProfile.admin) {
+      if (userProfile.password !== chatroom.liffUserID) {
+        throw new UnauthorizedException();
       }
     }
     const history = await this.historyService.findByChatroomIDAndTime(
@@ -59,30 +60,20 @@ export class HistoryController {
   async createMessage(
     @Param('chatroomID') chatroomID: string,
     @Authorization() user,
-    @Headers('userID') userID: string,
     @Body() createMessageDto: CreateMessageDto,
   ) {
     if (!user) {
-      //If user authorization fail, check if header has userID
-      if (!userID) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
+    }
+    const userProfile = await this.usersService.findOneByID(user._id);
+    const chatroom = await this.chatroomsService.findOneByID(chatroomID);
+    if (!userProfile) {
+      throw new UnauthorizedException();
+    }
+    if (!userProfile.admin) {
+      if (userProfile.password !== chatroom.liffUserID) {
+        throw new UnauthorizedException();
       }
-      if (
-        userID !==
-        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
-          .liffUserID
-      ) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
-
-      //Create message and notify client
-      const message = await this.historyService.createHistory(
-        createMessageDto.context,
-        chatroomID,
-        userID,
-      );
-      this.chatGateway.server.sockets.to(chatroomID).emit('message');
-      return message;
     }
 
     //Create message and notify client
@@ -99,19 +90,18 @@ export class HistoryController {
   async getLatestMessage(
     @Param('chatroomID') chatroomID: string,
     @Authorization() user,
-    @Headers('userID') userID: string,
   ) {
     if (!user) {
-      //If user authorization fail, check if header has userID
-      if (!userID) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
-      if (
-        userID !==
-        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
-          .liffUserID
-      ) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
+    }
+    const userProfile = await this.usersService.findOneByID(user._id);
+    const chatroom = await this.chatroomsService.findOneByID(chatroomID);
+    if (!userProfile) {
+      throw new UnauthorizedException();
+    }
+    if (!userProfile.admin) {
+      if (userProfile.password !== chatroom.liffUserID) {
+        throw new UnauthorizedException();
       }
     }
 
@@ -123,27 +113,24 @@ export class HistoryController {
   async readMessage(
     @Param('chatroomID') chatroomID: string,
     @Authorization() user,
-    @Headers('userID') userID: string,
     @Body() readMessageDto: ReadMessageDto,
   ) {
     if (!user) {
-      //If user authorization fail, check if header has userID
-      if (!userID) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
+    }
+    const userProfile = await this.usersService.findOneByID(user._id);
+    const chatroom = await this.chatroomsService.findOneByID(chatroomID);
+    if (!userProfile) {
+      throw new UnauthorizedException();
+    }
+    if (!userProfile.admin) {
+      if (userProfile.password !== chatroom.liffUserID) {
+        throw new UnauthorizedException();
       }
-      if (
-        userID !==
-        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
-          .liffUserID
-      ) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
-    } else {
-      userID = user._id;
     }
 
     if (
-      userID ==
+      user._id ==
       (await this.historyService.findOneByID(readMessageDto.messageID)).author
     ) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -151,7 +138,7 @@ export class HistoryController {
 
     const readMessages = await this.historyService.readMessage(
       chatroomID,
-      userID,
+      user._id,
       readMessageDto.messageID,
     );
 
@@ -164,27 +151,24 @@ export class HistoryController {
   async getLatestReadMessageID(
     @Param('chatroomID') chatroomID: string,
     @Authorization() user,
-    @Headers('userID') userID: string,
   ) {
     if (!user) {
-      //If user authorization fail, check if header has userID
-      if (!userID) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
+    }
+    const userProfile = await this.usersService.findOneByID(user._id);
+    const chatroom = await this.chatroomsService.findOneByID(chatroomID);
+    if (!userProfile) {
+      throw new UnauthorizedException();
+    }
+    if (!userProfile.admin) {
+      if (userProfile.password !== chatroom.liffUserID) {
+        throw new UnauthorizedException();
       }
-      if (
-        userID !==
-        (await this.chatroomsService.findOneByIDWithoutUserID(chatroomID))
-          .liffUserID
-      ) {
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-      }
-    } else {
-      userID = user._id;
     }
 
     const latestReadMessageID = this.historyService.getLatestReadMessage(
       chatroomID,
-      userID,
+      user._id,
     );
 
     return latestReadMessageID;
