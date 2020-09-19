@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { config } from 'dotenv';
 import { JwtStrategy } from './jwt.strategy';
 import { LiffLocalStrategy } from './liffLocal.strategy';
+import { AdminJwtStrategy } from './jwtAdmin.strategy';
 
 config();
 
@@ -26,7 +27,7 @@ config();
     AdminLocalStrategy,
     JwtStrategy,
     LiffLocalStrategy,
-    AdminLocalStrategy,
+    AdminJwtStrategy,
   ],
   controllers: [AuthController],
   exports: [AuthService],
