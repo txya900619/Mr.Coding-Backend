@@ -17,7 +17,7 @@ export class ChatRoomsService {
     return await createdChatRoom.save();
   }
 
-  async findAll(): Promise<ChatRoom[]> {
+  async findAllWithoutUserID(): Promise<ChatRoom[]> {
     return await this.chatroomModel
       .find()
       .select('-lineChatroomUserID -liffUserID')

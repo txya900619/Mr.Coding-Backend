@@ -10,15 +10,12 @@ import { Server } from 'socket.io';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { UsersService } from 'src/users/users.service';
 import { ExtendedSocket } from './extendedSocket.interface';
-import { HistoryService } from 'src/history/history.service';
 import { AuthorizationWS } from 'src/auth/authorizationWS.decorator';
-import { cachedDataVersionTag } from 'v8';
 @WebSocketGateway()
 export class ChatGateway {
   constructor(
     private chatroomsService: ChatRoomsService,
     private usersService: UsersService,
-    private historyService: HistoryService,
   ) {}
 
   @WebSocketServer()
