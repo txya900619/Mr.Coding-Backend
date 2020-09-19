@@ -23,7 +23,7 @@ config();
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Get() //Get all user profile, need admin authority(now all user is admin)
   async getUsers() {
     return await this.usersService.findAllPublic();
@@ -60,7 +60,7 @@ export class UsersController {
     return user;
   }
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Post('admin')
   async createAdmin(@Body() createAdminDto: CreateAdminDto) {
     const user = this.usersService.createAdmin(createAdminDto);
@@ -70,7 +70,7 @@ export class UsersController {
     return user;
   }
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Patch(':id/info') //Change user info, only self can use
   async changeInfo(
     @Param('id') id: string,
@@ -86,7 +86,7 @@ export class UsersController {
     return await this.usersService.updateInfo(id, updateInfoDto);
   }
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Patch(':id/avatar') //Change user avatar, only self can use
   async changeAvatarUrl(
     @Param('id') id: string,
@@ -102,7 +102,7 @@ export class UsersController {
     return await this.usersService.updateAvatar(id, updateAvatarDto);
   }
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Patch(':id/cc') //Change user cc(? , only self can use
   async changeCc(
     @Param('id') id: string,

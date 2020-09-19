@@ -22,7 +22,7 @@ config();
 export class ChatRoomsController {
   constructor(private chatroomsService: ChatRoomsService) {}
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Get() //Get all chatroom, need admin authority
   async getChatRooms() {
     return await this.chatroomsService.findAllWithoutUserID();
@@ -56,7 +56,7 @@ export class ChatRoomsController {
     return chatroom;
   }
 
-  @UseGuards(AuthGuard('jwtAdmin'))
+  @UseGuards(AuthGuard('adminJwt'))
   @Patch(':id/closed') //Close the chatroom
   async changeClosed(
     @Param('id') id, //This ID is _id auto create by mongoDB, not chatroom identify

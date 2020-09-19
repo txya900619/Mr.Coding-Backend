@@ -4,10 +4,7 @@ import { Strategy } from 'passport-local';
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class AdminLocalStrategy extends PassportStrategy(
-  Strategy,
-  'liffLocal',
-) {
+export class LiffLocalStrategy extends PassportStrategy(Strategy, 'liffLocal') {
   constructor(
     private authService: AuthService,
     private httpService: HttpService,
