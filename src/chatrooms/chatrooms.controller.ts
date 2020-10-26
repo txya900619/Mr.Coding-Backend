@@ -34,6 +34,7 @@ export class ChatRoomsController {
     @Body() createChatRoomDto: CreateChatRoomDto,
     @Headers('authorization') auth, //line bot's auth token,
   ) {
+    console.log(createChatRoomDto);
     if (auth != (process.env.LineBotAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
