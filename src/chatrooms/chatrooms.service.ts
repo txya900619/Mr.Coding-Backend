@@ -19,8 +19,31 @@ export class ChatRoomsService {
 
   async findAllWithoutUserID(): Promise<ChatRoom[]> {
     return await this.chatroomModel
-      .find()
-      .select('-lineChatroomUserID -liffUserID')
+      .aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'liffUserID',
+            foreignField: 'password',
+            as: 'someField',
+          },
+        },
+        {
+          $addFields: {
+            avatar: '$someField.avatar',
+          },
+        },
+        {
+          $unwind: '$avatar',
+        },
+        {
+          $project: {
+            someField: 0,
+            lineChatroomUserID: 0,
+            liffUserID: 0,
+          },
+        },
+      ])
       .exec();
   }
 
