@@ -16,6 +16,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
 import { BindLiffUserIDDto } from './dto/bind-liff-userID';
+import { ChangeNameDto } from './dto/change-name.dto';
 
 config();
 @Controller('api/chatrooms')
@@ -89,6 +90,19 @@ export class ChatRoomsController {
       );
     }
 
+    return chatroom;
+  }
+
+  @UseGuards(AuthGuard('adminJwt'))
+  @Patch(':id/name') //Close the chatroom
+  async changeName(
+    @Param('id') id, //This ID is _id auto create by mongoDB, not chatroom identify
+    @Body() changeNameDto: ChangeNameDto,
+  ) {
+    const chatroom = await this.chatroomsService.changeName(id, changeNameDto);
+    if (!chatroom) {
+      throw new HttpException('not found chatroom', HttpStatus.NOT_FOUND);
+    }
     return chatroom;
   }
 }

@@ -5,6 +5,7 @@ import { ChatRoom } from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { BindLiffUserIDDto } from './dto/bind-liff-userID';
+import { ChangeNameDto } from './dto/change-name.dto';
 
 @Injectable()
 export class ChatRoomsService {
@@ -101,6 +102,24 @@ export class ChatRoomsService {
     }
     return await this.chatroomModel
       .findByIdAndUpdate(id, bindLiffUserID, {
+        new: true,
+      })
+      .exec();
+  }
+
+  async changeName(
+    id: string, //This ID is _id auto create by mongoDB, not chatroom identify
+    changeNameDto: ChangeNameDto,
+  ): Promise<ChatRoom> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    const chatroom = this.chatroomModel.findOne({ _id: id });
+    if (!chatroom) {
+      return null;
+    }
+    return await this.chatroomModel
+      .findByIdAndUpdate(id, changeNameDto, {
         new: true,
       })
       .exec();
