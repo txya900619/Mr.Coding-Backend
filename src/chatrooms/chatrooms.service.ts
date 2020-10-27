@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
-import { ChatRoom } from './chatrooms.interface';
+import {
+  ChatRoom,
+  ChatRoomPublicWithAvatar,
+  ChatRoomPublic,
+} from './chatrooms.interface';
 import { CreateChatRoomDto } from './dto/create-chatroom.dto';
 import { ChangeClosedDto } from './dto/change-closed.dto';
 import { BindLiffUserIDDto } from './dto/bind-liff-userID';
@@ -18,7 +22,7 @@ export class ChatRoomsService {
     return await createdChatRoom.save();
   }
 
-  async findAllWithoutUserID(): Promise<ChatRoom[]> {
+  async findAllWithAvatarPublic(): Promise<ChatRoomPublicWithAvatar[]> {
     return await this.chatroomModel
       .aggregate([
         {
@@ -56,7 +60,7 @@ export class ChatRoomsService {
     return await this.chatroomModel.findOne({ _id: id }).exec();
   }
 
-  async findOneByIDWithoutUserID(id: string): Promise<ChatRoom> {
+  async findOneByIDPublic(id: string): Promise<ChatRoomPublic> {
     //This ID is _id auto create by mongoDB, not chatroom identify
     if (!isValidObjectId(id)) {
       return null;
@@ -67,7 +71,7 @@ export class ChatRoomsService {
       .exec();
   }
 
-  async changeClosed(
+  async updateClosed(
     id: string, //This ID is _id auto create by mongoDB, not chatroom identify
     changeClosedDto: ChangeClosedDto,
   ): Promise<ChatRoom> {
@@ -86,7 +90,7 @@ export class ChatRoomsService {
   }
 
   //TODO: need auth
-  async changeLiffUserID(
+  async updateLiffUserID(
     id: string,
     bindLiffUserID: BindLiffUserIDDto,
   ): Promise<ChatRoom> {
@@ -107,7 +111,7 @@ export class ChatRoomsService {
       .exec();
   }
 
-  async changeName(
+  async updateName(
     id: string, //This ID is _id auto create by mongoDB, not chatroom identify
     changeNameDto: ChangeNameDto,
   ): Promise<ChatRoom> {

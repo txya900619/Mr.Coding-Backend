@@ -17,6 +17,11 @@ import { ChangeClosedDto } from './dto/change-closed.dto';
 import { config } from 'dotenv';
 import { BindLiffUserIDDto } from './dto/bind-liff-userID';
 import { ChangeNameDto } from './dto/change-name.dto';
+import {
+  ChatRoom,
+  ChatRoomPublic,
+  ChatRoomPublicWithAvatar,
+} from './chatrooms.interface';
 
 config();
 @Controller('api/chatrooms')
@@ -25,15 +30,15 @@ export class ChatRoomsController {
 
   @UseGuards(AuthGuard('adminJwt'))
   @Get() //Get all chatroom, need admin authority
-  async getChatRooms() {
-    return await this.chatroomsService.findAllWithoutUserID();
+  async getChatRooms(): Promise<ChatRoomPublicWithAvatar[]> {
+    return await this.chatroomsService.findAllWithAvatarPublic();
   }
 
   @Post() //Create new chatroom, only google script can use
   async createChatRoom(
     @Body() createChatRoomDto: CreateChatRoomDto,
-    @Headers('authorization') auth, //line bot's auth token,
-  ) {
+    @Headers('authorization') auth: string, //line bot's auth token,
+  ): Promise<ChatRoom> {
     console.log(createChatRoomDto);
     if (auth != (process.env.LineBotAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
@@ -46,9 +51,9 @@ export class ChatRoomsController {
   }
 
   @Get(':id') //Get specific chatroom data
-  async getChatroom(@Param('id') id: string) {
+  async getChatroom(@Param('id') id: string): Promise<ChatRoomPublic> {
     //This ID is _id auto create by mongoDB, not chatroom identify
-    const chatroom = await this.chatroomsService.findOneByIDWithoutUserID(id);
+    const chatroom = await this.chatroomsService.findOneByIDPublic(id);
     if (!chatroom) {
       throw new HttpException(
         'not found chatroom match this id',
@@ -61,10 +66,10 @@ export class ChatRoomsController {
   @UseGuards(AuthGuard('adminJwt'))
   @Patch(':id/closed') //Close the chatroom
   async changeClosed(
-    @Param('id') id, //This ID is _id auto create by mongoDB, not chatroom identify
+    @Param('id') id: string, //This ID is _id auto create by mongoDB, not chatroom identify
     @Body() changeClosedDto: ChangeClosedDto,
-  ) {
-    const chatroom = await this.chatroomsService.changeClosed(
+  ): Promise<ChatRoom> {
+    const chatroom = await this.chatroomsService.updateClosed(
       id,
       changeClosedDto,
     );
@@ -76,10 +81,10 @@ export class ChatRoomsController {
 
   @Patch(':id/liffUserID')
   async bindLiffUserID(
-    @Param('id') id,
+    @Param('id') id: string,
     @Body() bindLiffUserIDDto: BindLiffUserIDDto,
-  ) {
-    const chatroom = await this.chatroomsService.changeLiffUserID(
+  ): Promise<ChatRoom> {
+    const chatroom = await this.chatroomsService.updateLiffUserID(
       id,
       bindLiffUserIDDto,
     );
@@ -97,10 +102,10 @@ export class ChatRoomsController {
   @UseGuards(AuthGuard('adminJwt'))
   @Patch(':id/name') //Close the chatroom
   async changeName(
-    @Param('id') id, //This ID is _id auto create by mongoDB, not chatroom identify
+    @Param('id') id: string, //This ID is _id auto create by mongoDB, not chatroom identify
     @Body() changeNameDto: ChangeNameDto,
-  ) {
-    const chatroom = await this.chatroomsService.changeName(id, changeNameDto);
+  ): Promise<ChatRoom> {
+    const chatroom = await this.chatroomsService.updateName(id, changeNameDto);
     if (!chatroom) {
       throw new HttpException('not found chatroom', HttpStatus.NOT_FOUND);
     }

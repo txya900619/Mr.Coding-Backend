@@ -18,7 +18,7 @@ export class HistoryService {
     return await creatHistory.save();
   }
 
-  async findOneByID(id: string) {
+  async findOneByID(id: string): Promise<History> {
     //This ID is history's _id auto create by mongoDB
     if (!isValidObjectId(id)) {
       return null;

@@ -6,7 +6,7 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { config } from 'dotenv';
-import { Users } from 'src/users/users.interface';
+import { Users, UsersPublic } from 'src/users/users.interface';
 import { compareSync } from 'bcrypt';
 
 config();
@@ -36,12 +36,12 @@ export class AuthService {
     userId: string;
     pictureUrl: string;
     statusMessage: string;
-  }): Promise<Users> {
+  }): Promise<UsersPublic> {
     const user = await this.usersService.upsertLiffUser(profile);
     return user;
   }
 
-  async login(user: Users) {
+  async login(user: { _id: string; username: string }): Promise<string> {
     const payload = { username: user.username, sub: user._id };
     return await this.jwtService.sign(payload);
   }

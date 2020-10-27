@@ -9,3 +9,12 @@ export interface Users extends Document {
   readonly cc: boolean; // TU needed
   readonly admin: boolean;
 }
+
+export interface UsersPublic extends Document {
+  readonly _id: string;
+  readonly username: string;
+  readonly avatar: string;
+  readonly info: string;
+  readonly cc: boolean; // TU needed
+  readonly admin: boolean;
+}

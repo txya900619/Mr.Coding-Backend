@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
-import { Users } from './users.interface';
+import { Users, UsersPublic } from './users.interface';
 import { UpdateInfoDto } from './dto/update-info.dto';
 import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { UpdateCcDto } from './dto/update-cc.dto';
@@ -14,7 +14,7 @@ export class UsersService {
     @InjectModel('Users') private readonly usersModel: Model<Users>,
   ) {}
 
-  async createAdmin(createAdminDto: CreateAdminDto): Promise<Users> {
+  async createAdmin(createAdminDto: CreateAdminDto): Promise<UsersPublic> {
     if (await this.usersModel.exists({ username: createAdminDto.username })) {
       return null;
     }
@@ -31,10 +31,10 @@ export class UsersService {
 
   async upsertLiffUser(liffUserProfile: {
     displayName: string;
-    userId: string;
+    userId: string; // will save to password
     pictureUrl: string;
     statusMessage: string;
-  }) {
+  }): Promise<UsersPublic> {
     if (
       await this.usersModel.exists({
         password: liffUserProfile.userId,
@@ -82,7 +82,7 @@ export class UsersService {
     return await this.usersModel.findOne({ _id: id }).exec();
   }
 
-  async findOneByIDPublic(id: string): Promise<Users> {
+  async findOneByIDPublic(id: string): Promise<UsersPublic> {
     //This function using on API, not include password in user profile
     if (!isValidObjectId(id)) {
       return null;
@@ -93,33 +93,17 @@ export class UsersService {
       .exec();
   }
 
-  async findAllPublic(): Promise<Users[]> {
+  async findAllPublic(): Promise<UsersPublic[]> {
     //This function using on API, not include password in all user profile
-    return await this.usersModel
-      .find()
-      .select('-password')
-      .exec();
+    return await this.usersModel.find().select('-password').exec();
   }
 
-  async updateInfo(id: string, info: UpdateInfoDto): Promise<Users> {
+  async update(
+    id: string,
+    dto: UpdateAvatarDto | UpdateInfoDto | UpdateCcDto,
+  ): Promise<UsersPublic> {
     return await this.usersModel
-      .findByIdAndUpdate(id, info, { new: true })
-      .select('-password')
-      .exec();
-  }
-
-  async updateAvatar(id: string, avatar: UpdateAvatarDto): Promise<Users> {
-    return await this.usersModel
-      .findByIdAndUpdate(id, avatar, { new: true })
-      .select('-password')
-      .exec();
-  }
-
-  async updateCc(id: string, cc: UpdateCcDto): Promise<Users> {
-    return await this.usersModel
-      .findByIdAndUpdate(id, cc, {
-        new: true,
-      })
+      .findByIdAndUpdate(id, dto, { new: true })
       .select('-password')
       .exec();
   }

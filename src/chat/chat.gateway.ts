@@ -25,8 +25,8 @@ export class ChatGateway {
   async handleJoin(
     @MessageBody() data: string, //chatroom's _id
     @ConnectedSocket() client: ExtendedSocket,
-    @AuthorizationWS() user: any,
-  ) {
+    @AuthorizationWS() user: { _id: string; username: string },
+  ): Promise<void> {
     if (!user) {
       throw new WsException('Unauthorized access');
     } else {

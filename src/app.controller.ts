@@ -2,6 +2,8 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users/users.service';
+import { UsersPublic } from './users/users.interface';
+import { AuthorizedRequest } from './app.interface';
 
 @Controller()
 export class AppController {
@@ -17,7 +19,7 @@ export class AppController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('api/me') //Get admin profile
-  async getMe(@Req() req) {
+  async getMe(@Req() req: AuthorizedRequest): Promise<UsersPublic> {
     return await this.usersService.findOneByIDPublic(req.user._id);
   }
 }

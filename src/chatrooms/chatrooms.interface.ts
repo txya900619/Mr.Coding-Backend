@@ -7,3 +7,13 @@ export interface ChatRoom extends Document {
   readonly liffUserID: string;
   readonly closed: boolean;
 }
+
+export interface ChatRoomPublic extends Document {
+  readonly _id: string;
+  readonly name: string;
+  readonly closed: boolean;
+}
+
+export interface ChatRoomPublicWithAvatar extends ChatRoomPublic {
+  readonly avatar: string;
+}

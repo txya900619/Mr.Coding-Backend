@@ -13,7 +13,10 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, 'adminJwt') {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: {
+    sub: string;
+    username: string;
+  }): Promise<{ _id: string; username: string }> {
     const user = await this.usersService.findOneByID(payload.sub);
     if (!user.admin) {
       throw new UnauthorizedException();

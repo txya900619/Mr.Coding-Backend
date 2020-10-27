@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 
+//TODO: should add ref to Users(author)
 export const HistorySchema = new mongoose.Schema(
   {
     context: String,
