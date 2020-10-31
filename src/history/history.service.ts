@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
+import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
 import { History } from './history.interface';
 
 @Injectable()
 export class HistoryService {
   constructor(
     @InjectModel('History') private readonly historyModel: Model<History>,
+    private readonly chatroomsService: ChatRoomsService,
   ) {}
 
   async createHistory(

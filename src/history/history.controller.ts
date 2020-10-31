@@ -11,6 +11,7 @@ import {
   UnauthorizedException,
   UseGuards,
   Req,
+  ForbiddenException,
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { ChatRoomsService } from 'src/chatrooms/chatrooms.service';
@@ -49,6 +50,9 @@ export class HistoryController {
       if (userProfile.password !== chatroom.liffUserID) {
         throw new UnauthorizedException();
       }
+    }
+    if (chatroom.closed) {
+      throw new ForbiddenException();
     }
     const history = await this.historyService.findByChatroomIDAndTime(
       chatroomID,
@@ -127,6 +131,9 @@ export class HistoryController {
       if (userProfile.password !== chatroom.liffUserID) {
         throw new UnauthorizedException();
       }
+    }
+    if (chatroom.closed) {
+      throw new ForbiddenException();
     }
 
     if (
