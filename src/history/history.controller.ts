@@ -51,9 +51,7 @@ export class HistoryController {
         throw new UnauthorizedException();
       }
     }
-    if (chatroom.closed) {
-      throw new ForbiddenException();
-    }
+
     const history = await this.historyService.findByChatroomIDAndTime(
       chatroomID,
       lastTime,
@@ -80,6 +78,9 @@ export class HistoryController {
       if (userProfile.password !== chatroom.liffUserID) {
         throw new UnauthorizedException();
       }
+    }
+    if (chatroom.closed) {
+      throw new ForbiddenException();
     }
 
     //Create message and notify client
