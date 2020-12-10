@@ -39,7 +39,6 @@ export class ChatRoomsController {
     @Body() createChatRoomDto: CreateChatRoomDto,
     @Headers('authorization') auth: string, //line bot's auth token,
   ): Promise<ChatRoom> {
-    console.log(createChatRoomDto);
     if (auth != (process.env.LineBotAuth || 'cc')) {
       throw new HttpException('Permission denied', HttpStatus.UNAUTHORIZED);
     }
@@ -84,6 +83,7 @@ export class ChatRoomsController {
     @Param('id') id: string,
     @Body() bindLiffUserIDDto: BindLiffUserIDDto,
   ): Promise<ChatRoom> {
+    console.log(bindLiffUserIDDto);
     const chatroom = await this.chatroomsService.updateLiffUserID(
       id,
       bindLiffUserIDDto,

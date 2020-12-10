@@ -16,7 +16,6 @@ export class LiffLocalStrategy extends PassportStrategy(Strategy, 'liffLocal') {
   }
 
   async validate(liffAccessToken: string): Promise<any> {
-    console.log(liffAccessToken);
     // username === liffAccessToken
     let profile: {
       displayName: string;
